@@ -1,6 +1,6 @@
-# Bynet AirBridge Package Studio
+# RepoForge
 
-Bynet AirBridge Package Studio is a FastAPI web application that creates offline
+RepoForge is a FastAPI web application that creates offline
 `.deb` bundles for air-gapped Ubuntu servers. It resolves packages inside
 temporary Docker containers that match the requested Ubuntu version, downloads
 only the requested packages and dependencies, and produces a downloadable
