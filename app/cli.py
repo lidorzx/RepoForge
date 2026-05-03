@@ -4,6 +4,7 @@ import sys
 from pydantic import ValidationError
 
 from app.bundler import BundleBuilder
+from app.config import SUPPORTED_DISTRO_IDS
 from app.jobs import JobStore
 from app.schemas import JobCreate
 
@@ -24,20 +25,26 @@ def parse_args() -> argparse.Namespace:
         prog="repoforge",
         description="Build an offline Linux package bundle with dependencies.",
     )
-    parser.add_argument(
+    target = parser.add_mutually_exclusive_group(required=True)
+    target.add_argument(
         "--ubuntu",
         "--ubuntu-version",
         dest="ubuntu_version",
-        required=True,
         choices=["20.04", "22.04", "24.04"],
         help="Target Ubuntu version.",
+    )
+    target.add_argument(
+        "--distro",
+        dest="distro_id",
+        choices=SUPPORTED_DISTRO_IDS,
+        help="Target distro ID, for example ubuntu-22.04, debian-12, rocky-9, or almalinux-9.",
     )
     parser.add_argument(
         "--arch",
         "--architecture",
         dest="architecture",
         default="amd64",
-        choices=["amd64"],
+        choices=["amd64", "arm64"],
         help="Target CPU architecture. Default: amd64.",
     )
     parser.add_argument(
@@ -50,9 +57,10 @@ def parse_args() -> argparse.Namespace:
 
 def main() -> int:
     args = parse_args()
+    distro_id = args.distro_id or f"ubuntu-{args.ubuntu_version}"
     try:
         request = JobCreate(
-            ubuntu_version=args.ubuntu_version,
+            distro_id=distro_id,
             architecture=args.architecture,
             packages=args.packages,
         )

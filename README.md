@@ -185,7 +185,7 @@ The same job can be created through the API:
 ```bash
 curl -X POST http://localhost:8000/api/jobs \
   -H 'Content-Type: application/json' \
-  -d '{"ubuntu_version":"22.04","architecture":"amd64","packages":["realmd","sssd"]}'
+  -d '{"distro_id":"ubuntu-22.04","architecture":"amd64","packages":["realmd","sssd"]}'
 ```
 
 Poll the returned UUID:
@@ -247,9 +247,9 @@ Returns application liveness:
 Returns operational readiness details such as Docker CLI availability, Docker
 server availability, output paths, and configured output UID/GID.
 
-### `GET /api/ubuntu/versions`
+### `GET /api/distros`
 
-Returns supported Ubuntu versions and the repository catalog used by the resolver.
+Returns supported Linux distributions and the repository catalog used by the resolver.
 
 ### `GET /api/package-options`
 
@@ -262,7 +262,7 @@ Request:
 
 ```json
 {
-  "ubuntu_version": "22.04",
+  "distro_id": "ubuntu-22.04",
   "architecture": "amd64",
   "packages": ["realmd", "sssd"]
 }
