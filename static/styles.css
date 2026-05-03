@@ -189,19 +189,19 @@ body {
 }
 
 .card-header {
-  padding: 16px 18px 0;
+  padding: 11px 14px 0;
 }
 
 .card-header h2 {
-  font-size: 14px;
+  font-size: 13px;
   font-weight: 600;
   color: var(--ink-2);
   letter-spacing: .01em;
 }
 
 .card-header p {
-  margin-top: 4px;
-  font-size: 12px;
+  margin-top: 3px;
+  font-size: 11px;
   color: var(--muted);
   line-height: 1.4;
 }
@@ -210,23 +210,44 @@ body {
 .form-col {
   display: flex;
   flex-direction: column;
-  gap: 12px;
+  gap: 10px;
   min-width: 0;
 }
 
 .form-card {
   display: flex;
   flex-direction: column;
-  gap: 14px;
-  padding-bottom: 16px;
+  gap: 10px;
+  padding-bottom: 12px;
+}
+
+/* Two-column card (arch + packages side by side) */
+.row-card {
+  flex-direction: row;
+  gap: 0;
+  padding: 0;
+  overflow: hidden;
+}
+
+.row-half {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 12px 14px;
+  min-width: 0;
+}
+
+.row-half + .row-half {
+  border-left: 1px solid var(--border);
 }
 
 /* ── OS family groups ───────────────────────────────────────────────────── */
 .os-families {
   display: flex;
   flex-direction: column;
-  gap: 14px;
-  padding: 14px 18px;
+  gap: 10px;
+  padding: 10px 14px;
 }
 
 .os-family-label {
@@ -269,8 +290,8 @@ body {
 .os-card-inner {
   display: flex;
   flex-direction: column;
-  gap: 2px;
-  padding: 10px 10px 8px;
+  gap: 1px;
+  padding: 8px 9px 7px;
 }
 
 .os-name   { font-size: 12px; font-weight: 700; color: var(--ink); line-height: 1.2; }
@@ -292,8 +313,8 @@ body {
 /* ── Architecture ───────────────────────────────────────────────────────── */
 .arch-group {
   display: flex;
-  gap: 10px;
-  padding: 0 18px 4px;
+  gap: 8px;
+  padding: 0 0 2px;
 }
 
 .arch-chip { display: block; cursor: pointer; flex: 1; }
@@ -321,7 +342,7 @@ body {
   display: flex;
   flex-direction: column;
   gap: 1px;
-  padding: 8px 18px 4px;
+  padding: 8px 14px 4px;
 }
 
 .repo-row {
@@ -423,9 +444,8 @@ body {
 /* ── Package input ──────────────────────────────────────────────────────── */
 .pkg-input {
   display: block;
-  width: calc(100% - 36px);
-  margin: 0 18px;
-  padding: 10px 13px;
+  width: 100%;
+  padding: 9px 11px;
   border: 1px solid var(--border-strong);
   border-radius: var(--radius-sm);
   font: inherit;
@@ -467,8 +487,8 @@ body {
 .preset-grid {
   display: flex;
   flex-direction: column;
-  gap: 7px;
-  padding: 0 18px;
+  gap: 5px;
+  padding: 0 14px;
 }
 
 .preset-card {
@@ -658,8 +678,8 @@ body {
 
 .log-body {
   flex: 1;
-  min-height: 500px;
-  max-height: 62vh;
+  min-height: 340px;
+  max-height: 50vh;
   overflow: auto;
   background: #010409;
   color: #c9d1d9;

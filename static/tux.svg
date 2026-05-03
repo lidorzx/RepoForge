@@ -1,0 +1,54 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 210 250">
+  <!-- Shadow -->
+  <ellipse cx="105" cy="242" rx="62" ry="8" fill="#00000022"/>
+
+  <!-- Left foot -->
+  <path d="M55 215 C30 208 14 216 12 228 C16 238 52 234 72 226Z" fill="#f7be00"/>
+  <path d="M12 228 C8 236 6 242 14 244 C22 238 28 230 34 224Z" fill="#f7be00"/>
+  <path d="M26 222 C20 232 18 240 28 242 C36 236 42 227 46 220Z" fill="#f7be00"/>
+
+  <!-- Right foot -->
+  <path d="M155 215 C180 208 196 216 198 228 C194 238 158 234 138 226Z" fill="#f7be00"/>
+  <path d="M198 228 C202 236 204 242 196 244 C188 238 182 230 176 224Z" fill="#f7be00"/>
+  <path d="M184 222 C190 232 192 240 182 242 C174 236 168 227 164 220Z" fill="#f7be00"/>
+
+  <!-- Body (black) -->
+  <path d="M45 115 C22 138 18 185 24 220 C30 240 65 248 105 248 C145 248 180 240 186 220 C192 185 188 138 165 115 C148 100 128 94 105 94 C82 94 62 100 45 115Z" fill="#1c1c1c"/>
+
+  <!-- Left wing/flipper -->
+  <path d="M32 130 C10 152 8 195 14 228 C24 238 44 230 50 216 C40 188 38 158 46 130Z" fill="#1c1c1c"/>
+  <!-- Right wing/flipper -->
+  <path d="M178 130 C200 152 202 195 196 228 C186 238 166 230 160 216 C170 188 172 158 164 130Z" fill="#1c1c1c"/>
+
+  <!-- Belly (cream) -->
+  <ellipse cx="105" cy="195" rx="58" ry="52" fill="#f0ebb8"/>
+
+  <!-- Neck/body join -->
+  <ellipse cx="105" cy="108" rx="42" ry="20" fill="#1c1c1c"/>
+
+  <!-- Head (black) -->
+  <ellipse cx="105" cy="62" rx="58" ry="55" fill="#1c1c1c"/>
+
+  <!-- Face white area -->
+  <ellipse cx="105" cy="70" rx="36" ry="34" fill="#f0ebb8"/>
+
+  <!-- Left eye white -->
+  <ellipse cx="86" cy="54" rx="16" ry="17" fill="white"/>
+  <!-- Right eye white -->
+  <ellipse cx="124" cy="54" rx="16" ry="17" fill="white"/>
+
+  <!-- Left pupil -->
+  <ellipse cx="90" cy="57" rx="9" ry="10" fill="#0d0d1a"/>
+  <!-- Right pupil -->
+  <ellipse cx="128" cy="57" rx="9" ry="10" fill="#0d0d1a"/>
+
+  <!-- Eye gleam left -->
+  <circle cx="84" cy="51" r="3.5" fill="white"/>
+  <!-- Eye gleam right -->
+  <circle cx="122" cy="51" r="3.5" fill="white"/>
+
+  <!-- Beak upper -->
+  <path d="M88 82 C96 72 114 72 122 82 C116 100 110 108 105 109 C100 108 94 100 88 82Z" fill="#f7be00"/>
+  <!-- Beak lower (open smile) -->
+  <path d="M92 94 C98 105 112 105 118 94 C112 107 108 110 105 110 C102 110 98 107 92 94Z" fill="#e8a000"/>
+</svg>
