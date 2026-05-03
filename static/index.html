@@ -1,0 +1,243 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Bynet AirBridge Package Studio</title>
+    <link rel="stylesheet" href="/styles.css" />
+  </head>
+  <body>
+
+    <header class="app-header">
+      <div class="header-inner">
+
+        <div class="brand">
+          <!-- Tux -->
+          <svg class="tux-logo" viewBox="0 0 140 170" xmlns="http://www.w3.org/2000/svg" aria-label="Tux the Linux penguin">
+            <!-- Body -->
+            <ellipse cx="70" cy="115" rx="52" ry="50" fill="#111"/>
+            <!-- Belly -->
+            <ellipse cx="70" cy="122" rx="33" ry="36" fill="#f7f3d0"/>
+            <!-- Head -->
+            <ellipse cx="70" cy="50" rx="38" ry="36" fill="#111"/>
+            <!-- Face (white oval) -->
+            <ellipse cx="70" cy="55" rx="24" ry="22" fill="#f7f3d0"/>
+            <!-- Left eye white -->
+            <ellipse cx="58" cy="44" rx="10" ry="11" fill="white"/>
+            <!-- Right eye white -->
+            <ellipse cx="82" cy="44" rx="10" ry="11" fill="white"/>
+            <!-- Left pupil -->
+            <ellipse cx="60" cy="45" rx="5.5" ry="6" fill="#1a1a2e"/>
+            <!-- Right pupil -->
+            <ellipse cx="84" cy="45" rx="5.5" ry="6" fill="#1a1a2e"/>
+            <!-- Eye shine left -->
+            <circle cx="57" cy="42" r="2" fill="white"/>
+            <!-- Eye shine right -->
+            <circle cx="81" cy="42" r="2" fill="white"/>
+            <!-- Beak upper -->
+            <path d="M62,67 Q70,60 78,67 Q72,76 70,77 Q68,76 62,67Z" fill="#f5a623"/>
+            <!-- Beak lower (slightly open / smile) -->
+            <path d="M65,72 Q70,78 75,72 Q72,77 70,78 Q68,77 65,72Z" fill="#e8891a"/>
+            <!-- Left wing -->
+            <ellipse cx="24" cy="120" rx="17" ry="42" transform="rotate(-8 24 120)" fill="#111"/>
+            <!-- Right wing -->
+            <ellipse cx="116" cy="120" rx="17" ry="42" transform="rotate(8 116 120)" fill="#111"/>
+            <!-- Left foot -->
+            <ellipse cx="52" cy="162" rx="20" ry="8" fill="#f5a623"/>
+            <ellipse cx="44" cy="158" rx="9" ry="5" transform="rotate(-20 44 158)" fill="#f5a623"/>
+            <!-- Right foot -->
+            <ellipse cx="88" cy="162" rx="20" ry="8" fill="#f5a623"/>
+            <ellipse cx="96" cy="158" rx="9" ry="5" transform="rotate(20 96 158)" fill="#f5a623"/>
+          </svg>
+
+          <div class="brand-text">
+            <span class="brand-name">BYNET AirBridge</span>
+            <span class="brand-sub">Package Studio</span>
+          </div>
+        </div>
+
+        <div class="header-right">
+          <div class="sys-indicator" id="dockerIndicator" title="Docker Engine">
+            <span class="indicator-dot" id="dockerDot"></span>
+            <span id="dockerLabel">Docker</span>
+          </div>
+          <div class="build-badge" id="buildBadge">
+            <span class="badge-dot"></span>
+            <span id="badgeText">Ready</span>
+          </div>
+        </div>
+
+      </div>
+    </header>
+
+    <div class="app-body">
+
+      <!-- ── LEFT: Build Form ──────────────────────────────────────────── -->
+      <section class="form-col">
+        <form id="jobForm" autocomplete="off">
+
+          <!-- OS selection -->
+          <div class="card form-card">
+            <div class="card-header">
+              <h2>Target OS</h2>
+              <p>Select the operating system running on the destination server.</p>
+            </div>
+            <div class="os-families" id="osFamilies">
+              <!-- populated by JS -->
+            </div>
+          </div>
+
+          <!-- Architecture -->
+          <div class="card form-card">
+            <div class="card-header">
+              <h2>Architecture</h2>
+            </div>
+            <div class="arch-group">
+              <label class="arch-chip">
+                <input type="radio" name="arch" value="amd64" checked />
+                <span class="chip-body">
+                  <strong>amd64</strong>
+                  <small>x86-64 · Intel · AMD</small>
+                </span>
+              </label>
+              <label class="arch-chip">
+                <input type="radio" name="arch" value="arm64" />
+                <span class="chip-body">
+                  <strong>arm64</strong>
+                  <small>ARM · Graviton · Apple M</small>
+                </span>
+              </label>
+            </div>
+          </div>
+
+          <!-- Extra repositories -->
+          <div class="card form-card">
+            <div class="card-header">
+              <h2>Extra Repositories</h2>
+              <p>Add third-party repos to the resolver container before downloading packages.</p>
+            </div>
+            <div class="extra-repo-list" id="extraRepoList">
+              <!-- populated by JS -->
+            </div>
+          </div>
+
+          <!-- Packages -->
+          <div class="card form-card">
+            <div class="card-header">
+              <h2>Packages</h2>
+              <p>Separate multiple package names with commas.</p>
+            </div>
+            <input
+              id="packages"
+              name="packages"
+              type="text"
+              class="pkg-input"
+              placeholder="e.g. nginx, curl, docker-ce"
+              required
+              spellcheck="false"
+            />
+            <div class="distro-meta" id="distroMeta"></div>
+          </div>
+
+          <!-- Presets -->
+          <div class="card form-card presets-card">
+            <div class="card-header">
+              <h2>Common Scenarios</h2>
+              <p>Click a card to add its packages to the list above.</p>
+            </div>
+            <div class="preset-grid" id="presetGrid">
+              <!-- populated by JS -->
+            </div>
+          </div>
+
+          <!-- Actions -->
+          <div class="form-actions">
+            <button type="submit" class="btn-build" id="buildBtn">
+              <svg class="btn-icon" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM9.555 7.168A1 1 0 008 8v4a1 1 0 001.555.832l3-2a1 1 0 000-1.664l-3-2z" clip-rule="evenodd"/></svg>
+              Build Bundle
+            </button>
+            <a class="btn-download hidden" id="downloadLink" href="#">
+              <svg class="btn-icon" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M3 17a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm3.293-7.707a1 1 0 011.414 0L9 10.586V3a1 1 0 112 0v7.586l1.293-1.293a1 1 0 111.414 1.414l-3 3a1 1 0 01-1.414 0l-3-3a1 1 0 010-1.414z" clip-rule="evenodd"/></svg>
+              Download Bundle
+            </a>
+          </div>
+
+        </form>
+      </section>
+
+      <!-- ── RIGHT: Status + Logs ──────────────────────────────────────── -->
+      <section class="status-col">
+
+        <div class="card stats-card">
+          <div class="stat-item">
+            <span class="stat-label">Status</span>
+            <span class="stat-value status-badge" id="jobStatus">No job</span>
+          </div>
+          <div class="stat-item">
+            <span class="stat-label">Distro</span>
+            <code class="stat-value" id="jobDistro">—</code>
+          </div>
+          <div class="stat-item">
+            <span class="stat-label">Packages</span>
+            <code class="stat-value" id="jobPackages">—</code>
+          </div>
+          <div class="stat-item">
+            <span class="stat-label">Bundle size</span>
+            <code class="stat-value" id="bundleSize">—</code>
+          </div>
+        </div>
+
+        <div class="card log-card">
+          <div class="log-toolbar">
+            <div class="log-toolbar-left">
+              <span class="log-dot red"></span>
+              <span class="log-dot yellow"></span>
+              <span class="log-dot green"></span>
+              <span class="log-title">Build Log</span>
+            </div>
+            <code class="log-job-id" id="logJobId">—</code>
+          </div>
+          <pre class="log-body" id="logs">Logs will appear here once a build starts.</pre>
+        </div>
+
+      </section>
+    </div>
+
+    <!-- History -->
+    <div class="history-wrap">
+      <div class="card history-card">
+        <div class="card-header">
+          <h2>Recent Jobs</h2>
+          <p>Builds created during this session.</p>
+        </div>
+        <div class="history-list" id="jobHistory">
+          <div class="history-empty">No jobs yet.</div>
+        </div>
+      </div>
+    </div>
+
+    <footer class="app-footer">
+      <div class="footer-brand">
+        <svg class="tux-logo footer-tux" viewBox="0 0 140 170" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+          <ellipse cx="70" cy="115" rx="52" ry="50" fill="#333"/>
+          <ellipse cx="70" cy="122" rx="33" ry="36" fill="#f7f3d0"/>
+          <ellipse cx="70" cy="50" rx="38" ry="36" fill="#333"/>
+          <ellipse cx="70" cy="55" rx="24" ry="22" fill="#f7f3d0"/>
+          <ellipse cx="58" cy="44" rx="10" ry="11" fill="white"/>
+          <ellipse cx="82" cy="44" rx="10" ry="11" fill="white"/>
+          <ellipse cx="60" cy="45" rx="5.5" ry="6" fill="#1a1a2e"/>
+          <ellipse cx="84" cy="45" rx="5.5" ry="6" fill="#1a1a2e"/>
+          <circle cx="57" cy="42" r="2" fill="white"/>
+          <circle cx="81" cy="42" r="2" fill="white"/>
+          <path d="M62,67 Q70,60 78,67 Q72,76 70,77 Q68,76 62,67Z" fill="#f5a623"/>
+          <ellipse cx="52" cy="162" rx="20" ry="8" fill="#f5a623"/>
+          <ellipse cx="88" cy="162" rx="20" ry="8" fill="#f5a623"/>
+        </svg>
+        <span>Bynet Data Communications</span>
+      </div>
+      <span class="footer-author">AirBridge Package Studio &nbsp;·&nbsp; Author: <strong>Lidor Eliya</strong> — Linux Engineer</span>
+    </footer>
+
+    <script src="/app.js"></script>
+  </body>
+</html>

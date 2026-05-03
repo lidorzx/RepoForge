@@ -1,0 +1,7 @@
+bundles/
+workdir/
+__pycache__/
+*.pyc
+.venv/
+.git/
+.pytest_cache/
