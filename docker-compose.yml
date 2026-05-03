@@ -1,13 +1,13 @@
 services:
-  airgap-package-builder:
+  repoforge:
     build: .
-    container_name: airgap-package-builder
+    container_name: repoforge
     ports:
       - "8000:8000"
     environment:
-      AIRGAP_HOST_WORKDIR: ${PWD}/workdir
-      AIRGAP_OUTPUT_UID: ${AIRGAP_OUTPUT_UID:-1000}
-      AIRGAP_OUTPUT_GID: ${AIRGAP_OUTPUT_GID:-1000}
+      REPOFORGE_HOST_WORKDIR: ${PWD}/workdir
+      REPOFORGE_OUTPUT_UID: ${REPOFORGE_OUTPUT_UID:-1000}
+      REPOFORGE_OUTPUT_GID: ${REPOFORGE_OUTPUT_GID:-1000}
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
       - ${PWD}/bundles:/app/bundles

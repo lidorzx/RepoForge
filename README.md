@@ -41,7 +41,7 @@ Each generated archive contains:
 - Internet access from the host for pulling images & downloading packages
 
 The compose setup mounts `/var/run/docker.sock` so the web app can start temporary
-resolver containers such as `ubuntu:22.04`. It also passes `AIRGAP_HOST_WORKDIR`
+resolver containers such as `ubuntu:22.04`. It also passes `REPOFORGE_HOST_WORKDIR`
 so those resolver containers can mount the host `workdir` path correctly.
 
 The app image includes the Docker CLI and uses the mounted Docker socket to start
@@ -63,8 +63,8 @@ If generated bundle files appear as root-owned or hard to delete from your SSH
 user, set the output owner before starting Compose:
 
 ```bash
-export AIRGAP_OUTPUT_UID=$(id -u)
-export AIRGAP_OUTPUT_GID=$(id -g)
+export REPOFORGE_OUTPUT_UID=$(id -u)
+export REPOFORGE_OUTPUT_GID=$(id -g)
 docker compose up -d --build
 ```
 
@@ -82,21 +82,21 @@ bundle command.
 Example: download `curl` and its dependencies for Ubuntu 22.04:
 
 ```bash
-docker compose run --rm airgap-package-builder \
+docker compose run --rm repoforge \
   python -m app.cli --ubuntu 22.04 curl
 ```
 
 Example: download `realmd` and `sssd` for Ubuntu 22.04:
 
 ```bash
-docker compose run --rm airgap-package-builder \
+docker compose run --rm repoforge \
   python -m app.cli --ubuntu 22.04 realmd sssd
 ```
 
 Recommended full Active Directory join bundle for a fresh Ubuntu 22.04 VM:
 
 ```bash
-docker compose run --rm airgap-package-builder \
+docker compose run --rm repoforge \
   python -m app.cli --ubuntu 22.04 \
   realmd sssd sssd-tools libnss-sss libpam-sss adcli krb5-user \
   samba-common-bin packagekit chrony dnsutils ldap-utils ca-certificates
@@ -197,7 +197,7 @@ curl http://localhost:8000/api/jobs/<job_id>
 Download when complete:
 
 ```bash
-curl -L -o airgap-bundle.tar.gz http://localhost:8000/api/jobs/<job_id>/download
+curl -L -o repoforge-bundle.tar.gz http://localhost:8000/api/jobs/<job_id>/download
 ```
 
 ## Install on the Air-Gapped Server
@@ -221,7 +221,7 @@ Optional local mini APT repository:
 
 ```bash
 ./install.sh --make-repo
-echo "deb [trusted=yes] file:$(pwd)/packages ./" | sudo tee /etc/apt/sources.list.d/airgap-local.list
+echo "deb [trusted=yes] file:$(pwd)/packages ./" | sudo tee /etc/apt/sources.list.d/repoforge-local.list
 sudo apt-get update
 sudo apt-get install realmd sssd
 ```
@@ -237,7 +237,7 @@ Returns application liveness:
 ```json
 {
   "status": "ok",
-  "application": "Bynet AirBridge Package Studio",
+  "application": "RepoForge",
   "version": "0.2.0"
 }
 ```
@@ -311,11 +311,11 @@ image, for example `ubuntu:22.04`. Inside that resolver container it:
 This avoids mirroring a full Ubuntu repository and downloads only the requested
 packages and their dependency closure.
 
-Resolver containers are named `airbridge-resolver-<job_id>` and labeled with the
+Resolver containers are named `repoforge-resolver-<job_id>` and labeled with the
 job ID so operators can inspect them while a build is running:
 
 ```bash
-docker ps --filter label=com.bynet.airbridge.role=resolver
+docker ps --filter label=com.repoforge.role=resolver
 ```
 
 The container is started with `--rm`, so it is removed automatically after the
@@ -342,8 +342,8 @@ user.
 Use:
 
 ```bash
-export AIRGAP_OUTPUT_UID=$(id -u)
-export AIRGAP_OUTPUT_GID=$(id -g)
+export REPOFORGE_OUTPUT_UID=$(id -u)
+export REPOFORGE_OUTPUT_GID=$(id -g)
 docker compose up -d --build
 ```
 
@@ -361,5 +361,5 @@ If you run the FastAPI app directly on the host instead of through Compose,
 install Docker on the host and make sure `docker` is in `PATH`, or set:
 
 ```bash
-export AIRGAP_DOCKER_BIN=/path/to/docker
+export REPOFORGE_DOCKER_BIN=/path/to/docker
 ```

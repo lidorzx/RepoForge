@@ -35,7 +35,7 @@ from app.schemas import (
 )
 
 
-APP_NAME = "Bynet AirBridge Package Studio"
+APP_NAME = "RepoForge"
 APP_VERSION = "0.3.0"
 
 app = FastAPI(title=APP_NAME, version=APP_VERSION)

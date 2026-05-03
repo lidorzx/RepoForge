@@ -21,8 +21,8 @@ class ConsoleJobStore(JobStore):
 
 def parse_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser(
-        prog="airbridge",
-        description="Build an offline Ubuntu package bundle with dependencies.",
+        prog="repoforge",
+        description="Build an offline Linux package bundle with dependencies.",
     )
     parser.add_argument(
         "--ubuntu",

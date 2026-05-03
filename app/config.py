@@ -99,10 +99,16 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 BUNDLES_DIR = BASE_DIR / "bundles"
 WORKDIR = BASE_DIR / "workdir"
 STATIC_DIR = BASE_DIR / "static"
-HOST_WORKDIR = Path(os.environ.get("AIRGAP_HOST_WORKDIR", str(WORKDIR))).resolve()
-DOCKER_BIN = os.environ.get("AIRGAP_DOCKER_BIN", "docker")
-OUTPUT_UID = int(os.environ["AIRGAP_OUTPUT_UID"]) if os.environ.get("AIRGAP_OUTPUT_UID") else None
-OUTPUT_GID = int(os.environ["AIRGAP_OUTPUT_GID"]) if os.environ.get("AIRGAP_OUTPUT_GID") else None
+HOST_WORKDIR = Path(
+    os.environ.get("REPOFORGE_HOST_WORKDIR")
+    or os.environ.get("AIRGAP_HOST_WORKDIR")
+    or str(WORKDIR)
+).resolve()
+DOCKER_BIN = os.environ.get("REPOFORGE_DOCKER_BIN") or os.environ.get("AIRGAP_DOCKER_BIN") or "docker"
+OUTPUT_UID_RAW = os.environ.get("REPOFORGE_OUTPUT_UID") or os.environ.get("AIRGAP_OUTPUT_UID")
+OUTPUT_GID_RAW = os.environ.get("REPOFORGE_OUTPUT_GID") or os.environ.get("AIRGAP_OUTPUT_GID")
+OUTPUT_UID = int(OUTPUT_UID_RAW) if OUTPUT_UID_RAW else None
+OUTPUT_GID = int(OUTPUT_GID_RAW) if OUTPUT_GID_RAW else None
 
 DOCKER_TIMEOUT_SECONDS = 60 * 60
 

@@ -1,1 +1,1 @@
-"""Bynet AirBridge Package Studio application package."""
+"""RepoForge application package."""

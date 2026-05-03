@@ -114,7 +114,7 @@ class BundleBuilder:
         )
         self._write_readme(bundle_root, distro_id, architecture, packages, extra_repos, distro)
 
-        archive_path = BUNDLES_DIR / f"airgap-bundle-{distro_id}-{job_id}.tar.gz"
+        archive_path = BUNDLES_DIR / f"repoforge-bundle-{distro_id}-{job_id}.tar.gz"
         if archive_path.exists():
             archive_path.unlink()
         with tarfile.open(archive_path, "w:gz") as archive:
@@ -147,14 +147,14 @@ class BundleBuilder:
         if docker_bin is None:
             raise BundleBuildError(
                 f"Docker CLI not found: {DOCKER_BIN}. Run with the provided Dockerfile/compose setup "
-                "or set AIRGAP_DOCKER_BIN to the docker client path."
+                "or set REPOFORGE_DOCKER_BIN to the docker client path."
             )
         host_output_dir = HOST_WORKDIR / str(job_id) / "output"
         command = [
             docker_bin, "run", "--rm",
-            "--name", f"airbridge-resolver-{job_id}",
-            "--label", "com.bynet.airbridge.role=resolver",
-            "--label", f"com.bynet.airbridge.job_id={job_id}",
+            "--name", f"repoforge-resolver-{job_id}",
+            "--label", "com.repoforge.role=resolver",
+            "--label", f"com.repoforge.job_id={job_id}",
             "--platform", f"linux/{architecture}",
             "-v", f"{host_output_dir}:/out",
             str(distro["docker_image"]),
@@ -362,7 +362,7 @@ REPOEOF
             script = textwrap.dedent(
                 """\
                 #!/usr/bin/env bash
-                # AirBridge bundle installer — RHEL / Rocky Linux / AlmaLinux
+                # RepoForge bundle installer — RHEL / Rocky Linux / AlmaLinux
                 set -euo pipefail
                 cd "$(dirname "$0")"
 
@@ -415,7 +415,7 @@ REPOEOF
             script = textwrap.dedent(
                 """\
                 #!/usr/bin/env bash
-                # AirBridge bundle installer — Debian / Ubuntu
+                # RepoForge bundle installer — Debian / Ubuntu
                 set -euo pipefail
                 cd "$(dirname "$0")"
 
@@ -461,12 +461,12 @@ REPOEOF
                     echo "Local APT repository created at: $(pwd)/packages"
                     echo ""
                     echo "Register it on the target machine:"
-                    echo "  echo \"deb [trusted=yes] file:$(pwd)/packages ./\" | sudo tee /etc/apt/sources.list.d/airgap-local.list"
+                    echo "  echo \"deb [trusted=yes] file:$(pwd)/packages ./\" | sudo tee /etc/apt/sources.list.d/repoforge-local.list"
                     echo "  sudo apt-get update"
                     echo "  sudo apt-get install <package-name>"
                     echo ""
                     echo "Remove when done:"
-                    echo "  sudo rm /etc/apt/sources.list.d/airgap-local.list"
+                    echo "  sudo rm /etc/apt/sources.list.d/repoforge-local.list"
                     exit 0 ;;
                   "")
                     : ;;
@@ -567,7 +567,7 @@ REPOEOF
 
                 ```bash
                 ./install.sh --make-repo
-                echo "deb [trusted=yes] file:$(pwd)/packages ./" | sudo tee /etc/apt/sources.list.d/airgap-local.list
+                echo "deb [trusted=yes] file:$(pwd)/packages ./" | sudo tee /etc/apt/sources.list.d/repoforge-local.list
                 sudo apt-get update
                 sudo apt-get install {" ".join(packages)}
                 ```
@@ -584,7 +584,7 @@ REPOEOF
         (bundle_root / "README.md").write_text(
             textwrap.dedent(
                 f"""\
-                # AirGap Package Bundle
+                # RepoForge Package Bundle
 
                 This bundle was generated for **{label}** on **{architecture}**.
 
