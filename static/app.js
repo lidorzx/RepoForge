@@ -1,79 +1,105 @@
-// ── DOM refs ────────────────────────────────────────────────────────────────
-const jobForm       = document.getElementById("jobForm");
+const jobForm = document.getElementById("jobForm");
 const packagesInput = document.getElementById("packages");
-const buildBtn      = document.getElementById("buildBtn");
-const downloadLink  = document.getElementById("downloadLink");
-const dockerDot     = document.getElementById("dockerDot");
-const dockerLabel   = document.getElementById("dockerLabel");
-const buildBadge    = document.getElementById("buildBadge");
-const badgeText     = document.getElementById("badgeText");
-const osFamilies    = document.getElementById("osFamilies");
+const buildBtn = document.getElementById("buildBtn");
+const downloadLink = document.getElementById("downloadLink");
+const dockerDot = document.getElementById("dockerDot");
+const dockerLabel = document.getElementById("dockerLabel");
+const buildBadge = document.getElementById("buildBadge");
+const badgeText = document.getElementById("badgeText");
+const osFamilies = document.getElementById("osFamilies");
 const extraRepoList = document.getElementById("extraRepoList");
-const presetGrid    = document.getElementById("presetGrid");
-const distroMeta    = document.getElementById("distroMeta");
-const jobStatus     = document.getElementById("jobStatus");
-const jobDistro     = document.getElementById("jobDistro");
-const jobPackages   = document.getElementById("jobPackages");
-const bundleSize    = document.getElementById("bundleSize");
-const logBody       = document.getElementById("logs");
-const logJobId      = document.getElementById("logJobId");
-const jobHistory    = document.getElementById("jobHistory");
+const presetGrid = document.getElementById("presetGrid");
+const distroMeta = document.getElementById("distroMeta");
+const jobStatus = document.getElementById("jobStatus");
+const jobDistro = document.getElementById("jobDistro");
+const jobPackages = document.getElementById("jobPackages");
+const bundleSize = document.getElementById("bundleSize");
+const logBody = document.getElementById("logs");
+const logJobId = document.getElementById("logJobId");
+const jobHistory = document.getElementById("jobHistory");
 
-// ── State ────────────────────────────────────────────────────────────────────
-let pollTimer        = null;
-let distroCatalog    = {};   // { distro_id: DistroInfo }
-let allOptions       = [];   // PackageOption[]
-let extraRepoCatalog = {};   // { repo_id: ExtraRepoInfo }
+let pollTimer = null;
+let distroCatalog = {};
+let allOptions = [];
+let extraRepoCatalog = {};
 let selectedDistroId = "ubuntu-22.04";
-const enabledRepos   = new Map(); // repo_id -> version (or null)
+const enabledRepos = new Map();
 
-// ── Helpers ──────────────────────────────────────────────────────────────────
+const FAMILY_META = {
+  debian: { label: "Debian / Ubuntu" },
+  rhel: { label: "RHEL Family" },
+};
+
+const STATUS_CLASS = {
+  queued: "status-queued",
+  running: "status-running",
+  completed: "status-done",
+  failed: "status-failed",
+};
+
 function parsePackages(value) {
-  return value.split(",").map(s => s.trim()).filter(Boolean);
+  return value.split(",").map((item) => item.trim()).filter(Boolean);
 }
 
-function addPackages(pkgs) {
-  const merged = [...new Set([...parsePackages(packagesInput.value), ...pkgs])];
+function addPackages(packages) {
+  const merged = [...new Set([...parsePackages(packagesInput.value), ...packages])];
   packagesInput.value = merged.join(", ");
 }
 
 function formatBytes(bytes) {
-  if (!bytes) return "—";
+  if (!bytes) return "-";
   const units = ["B", "KB", "MB", "GB"];
-  let size = bytes, u = 0;
-  while (size >= 1024 && u < units.length - 1) { size /= 1024; u++; }
-  return `${size.toFixed(u === 0 ? 0 : 1)} ${units[u]}`;
+  let size = bytes;
+  let unit = 0;
+  while (size >= 1024 && unit < units.length - 1) {
+    size /= 1024;
+    unit += 1;
+  }
+  return `${size.toFixed(unit === 0 ? 0 : 1)} ${units[unit]}`;
 }
 
 function setBadge(text, state) {
   badgeText.textContent = text;
-  buildBadge.className = "build-badge " + (state || "");
+  buildBadge.className = `build-badge ${state || ""}`.trim();
 }
 
-// ── OS card grid ─────────────────────────────────────────────────────────────
-const FAMILY_META = {
-  debian: { label: "Debian / Ubuntu" },
-  rhel:   { label: "RHEL Family" },
-};
+function osDisplayParts(distro) {
+  if (distro.id.startsWith("ubuntu-")) {
+    return { name: "Ubuntu", detail: distro.label.replace("Ubuntu ", "") };
+  }
+  if (distro.id.startsWith("debian-")) {
+    return { name: "Debian", detail: distro.label.replace("Debian ", "") };
+  }
+  if (distro.id.startsWith("rocky-")) {
+    return { name: "Rocky Linux", detail: distro.label.replace("Rocky Linux ", "") };
+  }
+  if (distro.id.startsWith("almalinux-")) {
+    return { name: "AlmaLinux", detail: distro.label.replace("AlmaLinux ", "") };
+  }
+  return { name: distro.label, detail: distro.id };
+}
 
 function renderOsGrid(catalog) {
   distroCatalog = catalog;
-  const groups = {};
-  for (const [id, info] of Object.entries(catalog)) {
-    const f = info.family;
-    if (!groups[f]) groups[f] = [];
-    groups[f].push({ id, ...info });
+  if (!distroCatalog[selectedDistroId]) {
+    selectedDistroId = Object.keys(distroCatalog)[0] || selectedDistroId;
   }
 
-  osFamilies.innerHTML = "";
+  const groups = {};
+  for (const [id, info] of Object.entries(catalog)) {
+    const family = info.family || "other";
+    if (!groups[family]) groups[family] = [];
+    groups[family].push({ id, ...info });
+  }
+
+  osFamilies.replaceChildren();
   for (const [family, distros] of Object.entries(groups)) {
-    const meta = FAMILY_META[family] || { label: family };
     const section = document.createElement("div");
     section.className = "os-family";
 
     const heading = document.createElement("div");
     heading.className = "os-family-label";
-    heading.textContent = meta.label;
+    heading.textContent = (FAMILY_META[family] || { label: family }).label;
     section.appendChild(heading);
 
     const grid = document.createElement("div");
@@ -81,28 +107,33 @@ function renderOsGrid(catalog) {
 
     for (const distro of distros) {
       const label = document.createElement("label");
-      label.className = "os-card" + (distro.id === selectedDistroId ? " selected" : "");
+      label.className = `os-card ${distro.id === selectedDistroId ? "selected" : ""}`.trim();
       label.dataset.distroId = distro.id;
 
-      // Split label into name + detail
-      let osName = distro.label, osDetail = "";
-      if (distro.id.startsWith("ubuntu-"))    { osName = "Ubuntu";       osDetail = distro.label.replace("Ubuntu ", ""); }
-      else if (distro.id.startsWith("debian-")) { osName = "Debian";     osDetail = distro.label.replace("Debian ", ""); }
-      else if (distro.id.startsWith("rocky-"))  { osName = "Rocky Linux"; osDetail = distro.label.replace("Rocky Linux ", ""); }
-      else if (distro.id.startsWith("almalinux-")) { osName = "AlmaLinux"; osDetail = distro.label.replace("AlmaLinux ", ""); }
+      const input = document.createElement("input");
+      input.type = "radio";
+      input.name = "distro";
+      input.value = distro.id;
+      input.checked = distro.id === selectedDistroId;
 
-      const pkgBadge = distro.pkg_ext === "rpm"
-        ? `<span class="pkg-badge rpm">RPM</span>`
-        : `<span class="pkg-badge deb">DEB</span>`;
+      const inner = document.createElement("span");
+      inner.className = "os-card-inner";
 
-      label.innerHTML = `
-        <input type="radio" name="distro" value="${distro.id}" ${distro.id === selectedDistroId ? "checked" : ""} />
-        <span class="os-card-inner">
-          <span class="os-name">${osName}</span>
-          <span class="os-detail">${osDetail}</span>
-          ${pkgBadge}
-        </span>`;
+      const parts = osDisplayParts(distro);
+      const name = document.createElement("span");
+      name.className = "os-name";
+      name.textContent = parts.name;
 
+      const detail = document.createElement("span");
+      detail.className = "os-detail";
+      detail.textContent = parts.detail;
+
+      const badge = document.createElement("span");
+      badge.className = `pkg-badge ${distro.pkg_ext === "rpm" ? "rpm" : "deb"}`;
+      badge.textContent = distro.pkg_ext === "rpm" ? "RPM" : "DEB";
+
+      inner.append(name, detail, badge);
+      label.append(input, inner);
       label.addEventListener("click", () => selectDistro(distro.id));
       grid.appendChild(label);
     }
@@ -118,7 +149,7 @@ function renderOsGrid(catalog) {
 
 function selectDistro(distroId) {
   selectedDistroId = distroId;
-  document.querySelectorAll(".os-card").forEach(card => {
+  document.querySelectorAll(".os-card").forEach((card) => {
     card.classList.toggle("selected", card.dataset.distroId === distroId);
   });
   updateDistroMeta();
@@ -129,104 +160,125 @@ function selectDistro(distroId) {
 function updateDistroMeta() {
   if (!distroMeta) return;
   const info = distroCatalog[selectedDistroId];
-  if (!info) { distroMeta.innerHTML = ""; return; }
-  if (info.family === "debian" && info.suites) {
-    distroMeta.innerHTML = `
-      <span class="meta-key">Codename</span><span class="meta-val">${info.codename}</span>
-      <span class="meta-key">Suites</span><span class="meta-val">${info.suites.join(", ")}</span>`;
-  } else {
-    distroMeta.innerHTML = `
-      <span class="meta-key">Codename</span><span class="meta-val">${info.codename || "—"}</span>
-      <span class="meta-key">Package manager</span><span class="meta-val">dnf / rpm</span>`;
+  if (!info) {
+    distroMeta.replaceChildren();
+    return;
+  }
+
+  const rows = info.family === "debian" && info.suites
+    ? [
+        ["Codename", info.codename || "-"],
+        ["Suites", info.suites.join(", ")],
+      ]
+    : [
+        ["Codename", info.codename || "-"],
+        ["Package manager", "dnf / rpm"],
+      ];
+
+  distroMeta.replaceChildren();
+  for (const [key, value] of rows) {
+    const keyEl = document.createElement("span");
+    keyEl.className = "meta-key";
+    keyEl.textContent = key;
+    const valueEl = document.createElement("span");
+    valueEl.className = "meta-val";
+    valueEl.textContent = value;
+    distroMeta.append(keyEl, valueEl);
   }
 }
 
-// ── Extra Repositories ────────────────────────────────────────────────────────
 function renderExtraRepos() {
   const info = distroCatalog[selectedDistroId];
   const family = info ? info.family : null;
-  extraRepoList.innerHTML = "";
+  extraRepoList.replaceChildren();
 
-  let anyVisible = false;
+  let visibleCount = 0;
   for (const [repoId, repo] of Object.entries(extraRepoCatalog)) {
-    const compatible = !family || repo.families.includes(family);
-    if (!compatible) continue;
-    anyVisible = true;
+    if (family && !repo.families.includes(family)) continue;
+    visibleCount += 1;
 
     const isEnabled = enabledRepos.has(repoId);
     const currentVersion = enabledRepos.get(repoId) || repo.default_version;
-
     const row = document.createElement("div");
-    row.className = "repo-row" + (isEnabled ? " enabled" : "");
+    row.className = `repo-row ${isEnabled ? "enabled" : ""}`.trim();
     row.dataset.repoId = repoId;
 
-    const versionSelect = repo.versioned
-      ? `<select class="repo-version-select" data-repo-id="${repoId}" ${!isEnabled ? "disabled" : ""}>
-          ${repo.versions.map(v =>
-            `<option value="${v}" ${v === currentVersion ? "selected" : ""}>${v}</option>`
-          ).join("")}
-        </select>`
-      : "";
+    const toggleLabel = document.createElement("label");
+    toggleLabel.className = "repo-toggle-label";
+    const checkbox = document.createElement("input");
+    checkbox.type = "checkbox";
+    checkbox.className = "repo-checkbox";
+    checkbox.dataset.repoId = repoId;
+    checkbox.checked = isEnabled;
+    const slider = document.createElement("span");
+    slider.className = "repo-toggle-slider";
+    toggleLabel.append(checkbox, slider);
 
-    row.innerHTML = `
-      <label class="repo-toggle-label">
-        <input type="checkbox" class="repo-checkbox" data-repo-id="${repoId}" ${isEnabled ? "checked" : ""} />
-        <span class="repo-toggle-slider"></span>
-      </label>
-      <div class="repo-info">
-        <span class="repo-name">${repo.label}</span>
-        <span class="repo-desc">${repo.description}</span>
-      </div>
-      ${versionSelect}
-    `;
+    const infoBox = document.createElement("div");
+    infoBox.className = "repo-info";
+    const name = document.createElement("span");
+    name.className = "repo-name";
+    name.textContent = repo.label;
+    const desc = document.createElement("span");
+    desc.className = "repo-desc";
+    desc.textContent = repo.description;
+    infoBox.append(name, desc);
 
-    const checkbox = row.querySelector(".repo-checkbox");
-    checkbox.addEventListener("change", () => toggleRepo(repoId, checkbox.checked, row));
+    row.append(toggleLabel, infoBox);
 
-    const sel = row.querySelector(".repo-version-select");
-    if (sel) {
-      sel.addEventListener("change", () => {
-        if (enabledRepos.has(repoId)) enabledRepos.set(repoId, sel.value);
+    let versionSelect = null;
+    if (repo.versioned) {
+      versionSelect = document.createElement("select");
+      versionSelect.className = "repo-version-select";
+      versionSelect.dataset.repoId = repoId;
+      versionSelect.disabled = !isEnabled;
+      for (const version of repo.versions) {
+        const option = document.createElement("option");
+        option.value = version;
+        option.textContent = version;
+        option.selected = version === currentVersion;
+        versionSelect.appendChild(option);
+      }
+      versionSelect.addEventListener("change", () => {
+        if (enabledRepos.has(repoId)) enabledRepos.set(repoId, versionSelect.value);
       });
+      row.appendChild(versionSelect);
     }
 
+    checkbox.addEventListener("change", () => toggleRepo(repoId, checkbox.checked, row));
     extraRepoList.appendChild(row);
   }
 
-  if (!anyVisible) {
-    extraRepoList.innerHTML = `<p class="no-presets" style="padding:14px 18px">No extra repositories available for this OS family.</p>`;
+  if (!visibleCount) {
+    const empty = document.createElement("p");
+    empty.className = "no-presets";
+    empty.textContent = "No extra repositories available for this OS family.";
+    extraRepoList.appendChild(empty);
   }
 }
 
 function toggleRepo(repoId, enabled, row) {
   const repo = extraRepoCatalog[repoId];
-  const sel = row.querySelector(".repo-version-select");
+  const versionSelect = row.querySelector(".repo-version-select");
 
   if (enabled) {
-    const version = sel ? sel.value : null;
-    enabledRepos.set(repoId, version);
+    enabledRepos.set(repoId, versionSelect ? versionSelect.value : null);
     row.classList.add("enabled");
-    if (sel) sel.disabled = false;
-    // Auto-add the default packages
-    if (repo.default_packages && repo.default_packages.length) {
-      addPackages(repo.default_packages);
-    }
+    if (versionSelect) versionSelect.disabled = false;
+    if (repo.default_packages?.length) addPackages(repo.default_packages);
   } else {
     enabledRepos.delete(repoId);
     row.classList.remove("enabled");
-    if (sel) sel.disabled = true;
+    if (versionSelect) versionSelect.disabled = true;
   }
 }
 
 function buildExtraReposPayload() {
-  const result = [];
-  for (const [repoId, version] of enabledRepos.entries()) {
-    result.push(version ? `${repoId}:${version}` : repoId);
-  }
-  return result;
+  return [...enabledRepos.entries()].map(([repoId, version]) => (
+    version ? `${repoId}:${version}` : repoId
+  ));
 }
 
-// ── Preset cards ─────────────────────────────────────────────────────────────
 function renderPresets(options) {
   allOptions = options;
   filterPresets();
@@ -236,44 +288,53 @@ function filterPresets() {
   const info = distroCatalog[selectedDistroId];
   const family = info ? info.family : null;
   const visible = family
-    ? allOptions.filter(o => o.distro_families.includes(family))
+    ? allOptions.filter((option) => option.distro_families.includes(family))
     : allOptions;
 
-  presetGrid.innerHTML = "";
+  presetGrid.replaceChildren();
   if (!visible.length) {
-    presetGrid.innerHTML = `<p class="no-presets">No presets for this OS.</p>`;
+    const empty = document.createElement("p");
+    empty.className = "no-presets";
+    empty.textContent = "No presets for this OS.";
+    presetGrid.appendChild(empty);
     return;
   }
-  for (const opt of visible) {
+
+  for (const option of visible) {
     const card = document.createElement("button");
     card.type = "button";
     card.className = "preset-card";
-    card.innerHTML = `
-      <strong>${opt.title}</strong>
-      <span>${opt.description}</span>
-      <div class="chip-row">${opt.packages.map(p => `<span class="chip">${p}</span>`).join("")}</div>`;
-    card.addEventListener("click", () => addPackages(opt.packages));
+
+    const title = document.createElement("strong");
+    title.textContent = option.title;
+    const desc = document.createElement("span");
+    desc.textContent = option.description;
+    const chips = document.createElement("div");
+    chips.className = "chip-row";
+    for (const pkg of option.packages) {
+      const chip = document.createElement("span");
+      chip.className = "chip";
+      chip.textContent = pkg;
+      chips.appendChild(chip);
+    }
+
+    card.append(title, desc, chips);
+    card.addEventListener("click", () => addPackages(option.packages));
     presetGrid.appendChild(card);
   }
 }
 
-// ── Job rendering ─────────────────────────────────────────────────────────────
-const STATUS_CLASS = {
-  queued: "status-queued", running: "status-running",
-  completed: "status-done", failed: "status-failed",
-};
-
 function renderJob(job) {
-  const cls = STATUS_CLASS[job.status] || "";
+  const statusClass = STATUS_CLASS[job.status] || "";
   jobStatus.textContent = job.status;
-  jobStatus.className = "stat-value status-badge " + cls;
+  jobStatus.className = `stat-value status-badge ${statusClass}`.trim();
 
   const distroInfo = distroCatalog[job.distro_id];
   jobDistro.textContent = distroInfo ? distroInfo.label : job.distro_id;
-  jobPackages.textContent = job.packages.join(", ") || "—";
+  jobPackages.textContent = job.packages.join(", ") || "-";
   bundleSize.textContent = formatBytes(job.bundle_size_bytes);
   logJobId.textContent = job.job_id;
-  logBody.textContent = job.logs.length ? job.logs.join("\n") : "Waiting for logs…";
+  logBody.textContent = job.logs.length ? job.logs.join("\n") : "Waiting for logs...";
   logBody.scrollTop = logBody.scrollHeight;
 
   if (job.status === "completed") {
@@ -288,59 +349,72 @@ function renderJob(job) {
   } else {
     downloadLink.classList.add("hidden");
     buildBtn.disabled = true;
-    setBadge(job.status === "running" ? "Building…" : "Queued", "running");
+    setBadge(job.status === "running" ? "Building..." : "Queued", "running");
   }
 }
 
-// ── System status ─────────────────────────────────────────────────────────────
 async function loadSystemStatus() {
-  const res = await fetch("/api/system");
-  if (!res.ok) return;
-  const sys = await res.json();
-  const ok = sys.docker_cli_available && sys.docker_server_available;
-  dockerDot.className = "indicator-dot " + (ok ? "dot-ok" : "dot-err");
-  dockerLabel.textContent = ok ? `Docker ${sys.docker_version || ""}`.trim() : "Docker unavailable";
+  const response = await fetch("/api/system");
+  if (!response.ok) return;
+  const system = await response.json();
+  const ok = system.docker_cli_available && system.docker_server_available;
+  dockerDot.className = `indicator-dot ${ok ? "dot-ok" : "dot-err"}`;
+  dockerLabel.textContent = ok ? `Docker ${system.docker_version || ""}`.trim() : "Docker unavailable";
 }
 
-// ── Job history ───────────────────────────────────────────────────────────────
 async function loadJobHistory() {
-  const res = await fetch("/api/jobs");
-  if (!res.ok) return;
-  const { jobs } = await res.json();
+  const response = await fetch("/api/jobs");
+  if (!response.ok) return;
+  const { jobs } = await response.json();
   if (!jobs.length) {
     jobHistory.innerHTML = `<div class="history-empty">No jobs yet.</div>`;
     return;
   }
-  jobHistory.innerHTML = "";
+
+  jobHistory.replaceChildren();
   for (const job of jobs.slice(0, 10)) {
     const distroInfo = distroCatalog[job.distro_id];
     const distroLabel = distroInfo ? distroInfo.label : job.distro_id;
-    const cls = STATUS_CLASS[job.status] || "";
     const row = document.createElement("div");
     row.className = "history-row";
-    row.innerHTML = `
-      <span class="status-badge ${cls}">${job.status}</span>
-      <code class="history-id">${job.job_id.slice(0, 8)}…</code>
-      <span class="history-distro">${distroLabel} / ${job.architecture}</span>
-      <span class="history-pkgs">${job.packages.join(", ")}</span>
-      <span class="history-size">${formatBytes(job.bundle_size_bytes)}</span>`;
+
+    const status = document.createElement("span");
+    status.className = `status-badge ${STATUS_CLASS[job.status] || ""}`.trim();
+    status.textContent = job.status;
+
+    const id = document.createElement("code");
+    id.className = "history-id";
+    id.textContent = `${job.job_id.slice(0, 8)}...`;
+
+    const distro = document.createElement("span");
+    distro.className = "history-distro";
+    distro.textContent = `${distroLabel} / ${job.architecture}`;
+
+    const packages = document.createElement("span");
+    packages.className = "history-pkgs";
+    packages.textContent = job.packages.join(", ");
+
+    const size = document.createElement("span");
+    size.className = "history-size";
+    size.textContent = formatBytes(job.bundle_size_bytes);
+
+    row.append(status, id, distro, packages, size);
     if (job.status === "completed") {
-      const dl = document.createElement("a");
-      dl.href = `/api/jobs/${job.job_id}/download`;
-      dl.className = "history-dl";
-      dl.textContent = "↓";
-      dl.title = "Download";
-      row.appendChild(dl);
+      const download = document.createElement("a");
+      download.href = `/api/jobs/${job.job_id}/download`;
+      download.className = "history-dl";
+      download.textContent = "DL";
+      download.title = "Download";
+      row.appendChild(download);
     }
     jobHistory.appendChild(row);
   }
 }
 
-// ── Polling ────────────────────────────────────────────────────────────────────
 async function pollJob(jobId) {
-  const res = await fetch(`/api/jobs/${jobId}`);
-  if (!res.ok) throw new Error("Unable to fetch job status.");
-  const job = await res.json();
+  const response = await fetch(`/api/jobs/${jobId}`);
+  if (!response.ok) throw new Error("Unable to fetch job status.");
+  const job = await response.json();
   renderJob(job);
   if (job.status === "completed" || job.status === "failed") {
     clearInterval(pollTimer);
@@ -349,11 +423,13 @@ async function pollJob(jobId) {
   }
 }
 
-// ── Form submit ───────────────────────────────────────────────────────────────
-jobForm.addEventListener("submit", async (e) => {
-  e.preventDefault();
+jobForm.addEventListener("submit", async (event) => {
+  event.preventDefault();
   const packages = parsePackages(packagesInput.value);
-  if (!packages.length) { logBody.textContent = "Enter at least one package name."; return; }
+  if (!packages.length) {
+    logBody.textContent = "Enter at least one package name.";
+    return;
+  }
 
   const archEl = document.querySelector('input[name="arch"]:checked');
   const architecture = archEl ? archEl.value : "amd64";
@@ -361,59 +437,59 @@ jobForm.addEventListener("submit", async (e) => {
 
   buildBtn.disabled = true;
   downloadLink.classList.add("hidden");
-  setBadge("Submitting…", "running");
-  logBody.textContent = "Submitting job…";
+  setBadge("Submitting...", "running");
+  logBody.textContent = "Submitting job...";
 
   try {
-    const res = await fetch("/api/jobs", {
+    const response = await fetch("/api/jobs", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ distro_id: selectedDistroId, architecture, packages, extra_repos }),
     });
-    if (!res.ok) {
-      const detail = await res.json().catch(() => ({}));
+    if (!response.ok) {
+      const detail = await response.json().catch(() => ({}));
       throw new Error(detail.detail ? JSON.stringify(detail.detail) : "Job submission failed.");
     }
-    const job = await res.json();
+
+    const job = await response.json();
     renderJob(job);
     clearInterval(pollTimer);
     loadJobHistory().catch(() => {});
     pollTimer = setInterval(() => pollJob(job.job_id).catch(showError), 2500);
-  } catch (err) {
-    showError(err);
+  } catch (error) {
+    showError(error);
   }
 });
 
-function showError(err) {
+function showError(error) {
   clearInterval(pollTimer);
   pollTimer = null;
   buildBtn.disabled = false;
   setBadge("Error", "failed");
   jobStatus.textContent = "failed";
   jobStatus.className = "stat-value status-badge status-failed";
-  logBody.textContent = err.message || String(err);
+  logBody.textContent = error.message || String(error);
 }
 
-// ── Bootstrap ─────────────────────────────────────────────────────────────────
 async function loadDistros() {
-  const res = await fetch("/api/distros");
-  if (!res.ok) throw new Error("Unable to load distros.");
-  const { distros } = await res.json();
+  const response = await fetch("/api/distros");
+  if (!response.ok) throw new Error("Unable to load distros.");
+  const { distros } = await response.json();
   renderOsGrid(distros);
 }
 
 async function loadExtraRepos() {
-  const res = await fetch("/api/extra-repos");
-  if (!res.ok) return;
-  const { repos } = await res.json();
+  const response = await fetch("/api/extra-repos");
+  if (!response.ok) return;
+  const { repos } = await response.json();
   extraRepoCatalog = repos;
   renderExtraRepos();
 }
 
 async function loadPresets() {
-  const res = await fetch("/api/package-options");
-  if (!res.ok) throw new Error("Unable to load package options.");
-  const { options } = await res.json();
+  const response = await fetch("/api/package-options");
+  if (!response.ok) throw new Error("Unable to load package options.");
+  const { options } = await response.json();
   renderPresets(options);
 }
 

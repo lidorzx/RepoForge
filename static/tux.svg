@@ -1,55 +1,97 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 120">
-  <!-- Drop shadow -->
-  <ellipse cx="50" cy="116" rx="28" ry="4" fill="#00000033"/>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" role="img" aria-label="RepoForge Linux package logo">
+  <defs>
+    <linearGradient id="blueBox" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#1d8de0"/>
+      <stop offset=".58" stop-color="#075992"/>
+      <stop offset="1" stop-color="#063653"/>
+    </linearGradient>
+    <linearGradient id="tealBox" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#28c6c6"/>
+      <stop offset=".62" stop-color="#0b7f88"/>
+      <stop offset="1" stop-color="#07525d"/>
+    </linearGradient>
+    <linearGradient id="tapeBlue" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#b8e5ff"/>
+      <stop offset="1" stop-color="#55a9e8"/>
+    </linearGradient>
+    <linearGradient id="tapeTeal" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#c7ffff"/>
+      <stop offset="1" stop-color="#65d5dc"/>
+    </linearGradient>
+    <linearGradient id="tuxBlack" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#24313a"/>
+      <stop offset=".55" stop-color="#071016"/>
+      <stop offset="1" stop-color="#020507"/>
+    </linearGradient>
+    <linearGradient id="belly" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#ffffff"/>
+      <stop offset="1" stop-color="#e9eaeb"/>
+    </linearGradient>
+    <linearGradient id="beak" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#ffcb25"/>
+      <stop offset="1" stop-color="#f39a00"/>
+    </linearGradient>
+    <filter id="softShadow" x="-20%" y="-20%" width="140%" height="150%">
+      <feDropShadow dx="0" dy="10" stdDeviation="9" flood-color="#00111f" flood-opacity=".22"/>
+    </filter>
+  </defs>
 
-  <!-- Feet -->
-  <ellipse cx="34" cy="108" rx="14" ry="6" fill="#f5a800" transform="rotate(-10 34 108)"/>
-  <ellipse cx="66" cy="108" rx="14" ry="6" fill="#f5a800" transform="rotate(10 66 108)"/>
-  <!-- Toe details left -->
-  <ellipse cx="22" cy="109" rx="5" ry="3.5" fill="#f5a800" transform="rotate(-10 22 109)"/>
-  <ellipse cx="29" cy="112" rx="5" ry="3.5" fill="#f5a800" transform="rotate(-10 29 112)"/>
-  <ellipse cx="38" cy="112" rx="5" ry="3.5" fill="#f5a800" transform="rotate(-10 38 112)"/>
-  <!-- Toe details right -->
-  <ellipse cx="78" cy="109" rx="5" ry="3.5" fill="#f5a800" transform="rotate(10 78 109)"/>
-  <ellipse cx="71" cy="112" rx="5" ry="3.5" fill="#f5a800" transform="rotate(10 71 112)"/>
-  <ellipse cx="62" cy="112" rx="5" ry="3.5" fill="#f5a800" transform="rotate(10 62 112)"/>
+  <rect width="512" height="512" rx="42" fill="#ffffff"/>
+  <ellipse cx="256" cy="468" rx="128" ry="18" fill="#101828" opacity=".12"/>
 
-  <!-- Body (black) -->
-  <ellipse cx="50" cy="82" rx="32" ry="34" fill="#1a1a1a"/>
+  <g fill="none" stroke-linecap="round" stroke-linejoin="round" opacity=".95">
+    <path d="M42 322 C28 238 48 166 112 108 S234 33 326 60 466 150 476 244" stroke="#1b75bb" stroke-width="7"/>
+    <path d="M111 109 L111 153 M256 47 L256 132 M390 112 L390 166 M472 244 L449 244" stroke="#179fa9" stroke-width="7"/>
+    <path d="M128 129 C174 141 194 166 202 213" stroke="#1b75bb" stroke-width="7" stroke-dasharray="12 12"/>
+    <path d="M374 129 C328 141 309 165 302 213" stroke="#179fa9" stroke-width="7" stroke-dasharray="12 12"/>
+    <circle cx="64" cy="277" r="14" fill="#1b75bb" stroke="#1b75bb"/>
+    <circle cx="112" cy="108" r="25" fill="#ffffff" stroke="#1b75bb" stroke-width="7"/>
+    <circle cx="112" cy="108" r="14" fill="#1b75bb"/>
+    <circle cx="256" cy="48" r="28" fill="#ffffff" stroke="#1b75bb" stroke-width="7"/>
+    <circle cx="256" cy="48" r="17" fill="#1b75bb"/>
+    <circle cx="390" cy="112" r="25" fill="#ffffff" stroke="#179fa9" stroke-width="7"/>
+    <circle cx="390" cy="112" r="14" fill="#179fa9"/>
+    <circle cx="476" cy="244" r="23" fill="#ffffff" stroke="#179fa9" stroke-width="7"/>
+    <circle cx="476" cy="244" r="12" fill="#179fa9"/>
+  </g>
 
-  <!-- Left wing -->
-  <path d="M18 68 C4 74 2 95 8 108 C16 112 28 106 28 100 C22 88 18 78 20 68Z" fill="#1a1a1a"/>
-  <!-- Right wing -->
-  <path d="M82 68 C96 74 98 95 92 108 C84 112 72 106 72 100 C78 88 82 78 80 68Z" fill="#1a1a1a"/>
+  <g filter="url(#softShadow)">
+    <g transform="translate(62 154)">
+      <path d="M0 44 L72 0 L160 24 L88 72 Z" fill="#2b9eee"/>
+      <path d="M0 44 L88 72 L88 172 L0 132 Z" fill="url(#blueBox)"/>
+      <path d="M88 72 L160 24 L160 126 L88 172 Z" fill="#064873"/>
+      <path d="M66 12 L95 20 L24 62 L0 51 Z" fill="url(#tapeBlue)" opacity=".8"/>
+      <text x="35" y="126" fill="#ffffff" font-family="Arial, Helvetica, sans-serif" font-size="39" font-weight="800">.deb</text>
+      <path d="M51 82 L75 69 L101 82 L76 96 Z" fill="#ffffff"/>
+      <path d="M51 82 L76 96 L76 124 L51 110 Z" fill="#edf7ff"/>
+      <path d="M76 96 L101 82 L101 110 L76 124 Z" fill="#dff0ff"/>
+    </g>
+    <g transform="translate(288 154)">
+      <path d="M0 44 L72 0 L160 24 L88 72 Z" fill="#32d2d2"/>
+      <path d="M0 44 L88 72 L88 172 L0 132 Z" fill="url(#tealBox)"/>
+      <path d="M88 72 L160 24 L160 126 L88 172 Z" fill="#08606a"/>
+      <path d="M66 12 L95 20 L24 62 L0 51 Z" fill="url(#tapeTeal)" opacity=".8"/>
+      <text x="43" y="126" fill="#ffffff" font-family="Arial, Helvetica, sans-serif" font-size="39" font-weight="800">.rpm</text>
+      <path d="M51 82 L75 69 L101 82 L76 96 Z" fill="#ffffff"/>
+      <path d="M51 82 L76 96 L76 124 L51 110 Z" fill="#e9ffff"/>
+      <path d="M76 96 L101 82 L101 110 L76 124 Z" fill="#d4f9fb"/>
+    </g>
+  </g>
 
-  <!-- Belly (cream/white) -->
-  <ellipse cx="50" cy="88" rx="20" ry="22" fill="#f5f0d0"/>
-
-  <!-- Neck -->
-  <ellipse cx="50" cy="52" rx="19" ry="8" fill="#1a1a1a"/>
-
-  <!-- Head (black) -->
-  <ellipse cx="50" cy="34" rx="27" ry="28" fill="#1a1a1a"/>
-
-  <!-- Face white -->
-  <ellipse cx="50" cy="39" rx="18" ry="18" fill="#f5f0d0"/>
-
-  <!-- Left eye white -->
-  <ellipse cx="38" cy="30" rx="9" ry="10" fill="white"/>
-  <!-- Right eye white -->
-  <ellipse cx="62" cy="30" rx="9" ry="10" fill="white"/>
-
-  <!-- Left pupil -->
-  <ellipse cx="41" cy="32" rx="5.5" ry="6" fill="#111"/>
-  <!-- Right pupil -->
-  <ellipse cx="65" cy="32" rx="5.5" ry="6" fill="#111"/>
-
-  <!-- Eye shine left -->
-  <circle cx="38" cy="28" r="2" fill="white"/>
-  <!-- Eye shine right -->
-  <circle cx="62" cy="28" r="2" fill="white"/>
-
-  <!-- Beak -->
-  <path d="M42 46 C46 40 54 40 58 46 C54 54 46 54 42 46Z" fill="#f5a800"/>
-  <path d="M44 50 C47 56 53 56 56 50" stroke="#d48000" stroke-width="1" fill="none"/>
+  <g filter="url(#softShadow)">
+    <path d="M164 382 C155 316 174 224 219 174 C226 166 236 160 256 160 C276 160 286 166 293 174 C338 224 357 316 348 382 C341 434 302 462 256 462 C210 462 171 434 164 382 Z" fill="url(#tuxBlack)"/>
+    <path d="M198 365 C190 306 209 222 256 198 C303 222 322 306 314 365 C308 413 285 441 256 441 C227 441 204 413 198 365 Z" fill="url(#belly)"/>
+    <path d="M176 312 C139 342 134 394 160 418 C186 419 209 392 207 361 C194 345 183 329 176 312 Z" fill="url(#tuxBlack)"/>
+    <path d="M336 312 C373 342 378 394 352 418 C326 419 303 392 305 361 C318 345 329 329 336 312 Z" fill="url(#tuxBlack)"/>
+    <ellipse cx="235" cy="219" rx="25" ry="37" fill="#ffffff"/>
+    <ellipse cx="277" cy="219" rx="25" ry="37" fill="#ffffff"/>
+    <ellipse cx="242" cy="223" rx="10" ry="17" fill="#101010"/>
+    <ellipse cx="284" cy="223" rx="10" ry="17" fill="#101010"/>
+    <circle cx="239" cy="213" r="5" fill="#ffffff"/>
+    <circle cx="281" cy="213" r="5" fill="#ffffff"/>
+    <path d="M211 268 C223 240 289 240 301 268 C292 302 220 302 211 268 Z" fill="url(#beak)"/>
+    <path d="M225 283 C241 299 271 299 287 283" fill="none" stroke="#7f3b00" stroke-width="5" stroke-linecap="round"/>
+    <path d="M182 405 C144 412 113 438 102 474 C150 495 208 470 229 426 C221 411 203 403 182 405 Z" fill="url(#beak)"/>
+    <path d="M330 405 C368 412 399 438 410 474 C362 495 304 470 283 426 C291 411 309 403 330 405 Z" fill="url(#beak)"/>
+  </g>
 </svg>

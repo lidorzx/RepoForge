@@ -3,19 +3,20 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>RepoForge — Bynet AirBridge</title>
+    <title>RepoForge</title>
     <link rel="icon" type="image/svg+xml" href="/tux.svg" />
     <link rel="stylesheet" href="/styles.css" />
   </head>
   <body>
-
     <header class="app-header">
       <div class="header-inner">
         <div class="brand">
-          <img src="/tux.svg" class="tux-logo" alt="Tux" />
+          <span class="logo-frame">
+            <img src="/tux.svg" class="tux-logo" alt="Linux Tux" />
+          </span>
           <div class="brand-text">
             <span class="brand-name">RepoForge</span>
-            <span class="brand-sub">Bynet AirBridge Package Studio</span>
+            <span class="brand-sub">Offline Linux Package Bundles</span>
           </div>
         </div>
         <div class="header-right">
@@ -31,17 +32,16 @@
       </div>
     </header>
 
-    <div class="app-body">
-
-      <!-- ── LEFT: Build Form ──────────────────────────────────────────── -->
+    <main class="app-body">
       <section class="form-col">
         <form id="jobForm" autocomplete="off">
-
           <div class="card form-card">
             <div class="card-header">
               <h2>Target OS</h2>
+              <p>Select the operating system that matches the offline target server.</p>
             </div>
             <div class="os-families" id="osFamilies"></div>
+            <div class="distro-meta" id="distroMeta"></div>
           </div>
 
           <div class="card form-card row-card">
@@ -52,17 +52,18 @@
               <div class="arch-group">
                 <label class="arch-chip">
                   <input type="radio" name="arch" value="amd64" checked />
-                  <span class="chip-body"><strong>amd64</strong><small>x86-64</small></span>
+                  <span class="chip-body"><strong>amd64</strong><small>x86-64 servers</small></span>
                 </label>
                 <label class="arch-chip">
                   <input type="radio" name="arch" value="arm64" />
-                  <span class="chip-body"><strong>arm64</strong><small>ARM / M-chip</small></span>
+                  <span class="chip-body"><strong>arm64</strong><small>ARM platforms</small></span>
                 </label>
               </div>
             </div>
             <div class="row-half">
               <div class="card-header">
                 <h2>Packages</h2>
+                <p>Comma-separated package names.</p>
               </div>
               <input
                 id="packages"
@@ -79,7 +80,7 @@
           <div class="card form-card">
             <div class="card-header">
               <h2>Extra Repositories</h2>
-              <p>Add third-party repos before downloading packages.</p>
+              <p>Add supported third-party repositories before resolving packages.</p>
             </div>
             <div class="extra-repo-list" id="extraRepoList"></div>
           </div>
@@ -87,28 +88,15 @@
           <div class="card form-card presets-card">
             <div class="card-header">
               <h2>Common Scenarios</h2>
-              <p>Click to add packages.</p>
+              <p>Choose a preset to add its packages to the build list.</p>
             </div>
             <div class="preset-grid" id="presetGrid"></div>
-          </div>
-
-          <div class="form-actions">
-            <button type="submit" class="btn-build" id="buildBtn">
-              <svg class="btn-icon" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM9.555 7.168A1 1 0 008 8v4a1 1 0 001.555.832l3-2a1 1 0 000-1.664l-3-2z" clip-rule="evenodd"/></svg>
-              Build Bundle
-            </button>
-            <a class="btn-download hidden" id="downloadLink" href="#">
-              <svg class="btn-icon" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M3 17a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm3.293-7.707a1 1 0 011.414 0L9 10.586V3a1 1 0 112 0v7.586l1.293-1.293a1 1 0 111.414 1.414l-3 3a1 1 0 01-1.414 0l-3-3a1 1 0 010-1.414z" clip-rule="evenodd"/></svg>
-              Download Bundle
-            </a>
           </div>
 
         </form>
       </section>
 
-      <!-- ── RIGHT: Status + Logs ──────────────────────────────────────── -->
       <section class="status-col">
-
         <div class="card stats-card">
           <div class="stat-item">
             <span class="stat-label">Status</span>
@@ -116,15 +104,15 @@
           </div>
           <div class="stat-item">
             <span class="stat-label">Distro</span>
-            <code class="stat-value" id="jobDistro">—</code>
+            <code class="stat-value" id="jobDistro">-</code>
           </div>
           <div class="stat-item">
             <span class="stat-label">Packages</span>
-            <code class="stat-value" id="jobPackages">—</code>
+            <code class="stat-value" id="jobPackages">-</code>
           </div>
           <div class="stat-item">
             <span class="stat-label">Size</span>
-            <code class="stat-value" id="bundleSize">—</code>
+            <code class="stat-value" id="bundleSize">-</code>
           </div>
         </div>
 
@@ -136,16 +124,29 @@
               <span class="log-dot green"></span>
               <span class="log-title">Build Log</span>
             </div>
-            <code class="log-job-id" id="logJobId">—</code>
+            <code class="log-job-id" id="logJobId">-</code>
           </div>
           <pre class="log-body" id="logs">Logs will appear here once a build starts.</pre>
         </div>
 
+        <div class="card form-actions-card">
+          <button type="submit" form="jobForm" class="btn-build" id="buildBtn">
+            <svg class="btn-icon" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
+              <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM9.555 7.168A1 1 0 008 8v4a1 1 0 001.555.832l3-2a1 1 0 000-1.664l-3-2z" clip-rule="evenodd"/>
+            </svg>
+            Build Bundle
+          </button>
+          <a class="btn-download hidden" id="downloadLink" href="#">
+            <svg class="btn-icon" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
+              <path fill-rule="evenodd" d="M3 17a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm3.293-7.707a1 1 0 011.414 0L9 10.586V3a1 1 0 112 0v7.586l1.293-1.293a1 1 0 111.414 1.414l-3 3a1 1 0 01-1.414 0l-3-3a1 1 0 010-1.414z" clip-rule="evenodd"/>
+            </svg>
+            Download Bundle
+          </a>
+        </div>
       </section>
-    </div>
+    </main>
 
-    <!-- History -->
-    <div class="history-wrap">
+    <section class="history-wrap">
       <div class="card history-card">
         <div class="card-header">
           <h2>Recent Jobs</h2>
@@ -154,14 +155,16 @@
           <div class="history-empty">No jobs yet.</div>
         </div>
       </div>
-    </div>
+    </section>
 
     <footer class="app-footer">
       <div class="footer-brand">
-        <img src="/tux.svg" class="tux-logo footer-tux" alt="Tux" />
-        <span>Bynet Data Communications</span>
+        <span class="logo-frame footer-logo">
+          <img src="/tux.svg" class="tux-logo footer-tux" alt="Linux Tux" />
+        </span>
+        <span>RepoForge</span>
       </div>
-      <span class="footer-author">AirBridge Package Studio &nbsp;·&nbsp; Author: <strong>Lidor Eliya</strong> — Linux Engineer</span>
+      <span class="footer-author">Author: <strong>Lidor Eliya</strong> - Linux Engineer</span>
     </footer>
 
     <script src="/app.js"></script>
