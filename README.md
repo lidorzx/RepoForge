@@ -36,10 +36,9 @@ Each generated archive contains:
 
 ## Requirements
 
-- Ubuntu 22.04 or 24.04 host
 - Docker Engine
 - Docker Compose plugin
-- Internet access from the host for pulling Ubuntu images and downloading packages
+- Internet access from the host for pulling images & downloading packages
 
 The compose setup mounts `/var/run/docker.sock` so the web app can start temporary
 resolver containers such as `ubuntu:22.04`. It also passes `AIRGAP_HOST_WORKDIR`
