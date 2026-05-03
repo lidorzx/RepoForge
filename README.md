@@ -175,36 +175,6 @@ Rocky Linux / AlmaLinux preset packages:
 - `bind-utils`
 - `openldap-clients`
 
-After installing the offline bundle on the target VM, verify DNS and time first:
-
-```bash
-timedatectl
-realm discover example.local
-```
-
-Then join:
-
-```bash
-sudo realm join example.local -U Administrator
-realm list
-id user@example.local
-```
-
-For automatic home directory creation:
-
-Ubuntu/Debian:
-
-```bash
-sudo pam-auth-update --enable mkhomedir
-```
-
-Rocky/Alma:
-
-```bash
-sudo authselect enable-feature with-mkhomedir
-sudo systemctl enable --now oddjobd
-```
-
 ## Install on the Air-Gapped Server
 
 Copy and extract the downloaded archive on the target server:
