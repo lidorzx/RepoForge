@@ -127,6 +127,7 @@ function selectDistro(distroId) {
 }
 
 function updateDistroMeta() {
+  if (!distroMeta) return;
   const info = distroCatalog[selectedDistroId];
   if (!info) { distroMeta.innerHTML = ""; return; }
   if (info.family === "debian" && info.suites) {
