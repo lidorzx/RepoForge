@@ -3,167 +3,531 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>RepoForge — Bynet AirBridge</title>
+    <title>RepoForge — Bynet AirBridge Package Studio</title>
     <link rel="icon" type="image/svg+xml" href="/tux.svg" />
-    <link rel="stylesheet" href="/styles.css" />
+    <style>
+      :root {
+        --bg:          #0d1117;
+        --bg-2:        #161b22;
+        --surface:     #1c2128;
+        --border:      #30363d;
+        --ink:         #e6edf3;
+        --ink-2:       #c9d1d9;
+        --muted:       #8b949e;
+        --accent:      #58a6ff;
+        --accent-dark: #1f6feb;
+        --accent-soft: rgba(88,166,255,.12);
+        --ok:          #3fb950;
+        --ok-bg:       rgba(63,185,80,.15);
+        --ok-border:   rgba(63,185,80,.4);
+        --radius:      12px;
+      }
+
+      *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+      body {
+        font-family: Inter, ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif;
+        background: var(--bg);
+        color: var(--ink);
+        min-height: 100vh;
+        display: flex;
+        flex-direction: column;
+      }
+
+      /* ── Nav ── */
+      nav {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 0 40px;
+        height: 60px;
+        border-bottom: 1px solid var(--border);
+        background: var(--bg-2);
+        position: sticky;
+        top: 0;
+        z-index: 10;
+      }
+
+      .nav-brand {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        text-decoration: none;
+      }
+
+      .nav-brand img { width: 36px; height: 42px; }
+
+      .nav-brand-text {
+        display: flex;
+        flex-direction: column;
+        line-height: 1.2;
+      }
+
+      .nav-name {
+        font-size: 15px;
+        font-weight: 700;
+        color: var(--ink);
+        letter-spacing: -.01em;
+      }
+
+      .nav-sub {
+        font-size: 11px;
+        color: var(--muted);
+        font-weight: 500;
+      }
+
+      .nav-launch {
+        display: inline-flex;
+        align-items: center;
+        gap: 7px;
+        padding: 8px 18px;
+        background: var(--accent-dark);
+        color: #fff;
+        border-radius: 8px;
+        font-size: 13px;
+        font-weight: 600;
+        text-decoration: none;
+        transition: background .15s, box-shadow .15s;
+        box-shadow: 0 0 0 1px rgba(88,166,255,.3), 0 2px 8px rgba(31,111,235,.35);
+      }
+
+      .nav-launch:hover {
+        background: var(--accent);
+        box-shadow: 0 0 0 1px rgba(88,166,255,.5), 0 4px 14px rgba(88,166,255,.3);
+      }
+
+      /* ── Hero ── */
+      .hero {
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        text-align: center;
+        padding: 80px 24px 60px;
+        gap: 0;
+      }
+
+      .hero-logo {
+        width: 260px;
+        height: 260px;
+        object-fit: contain;
+        margin-bottom: 36px;
+        filter: drop-shadow(0 0 60px rgba(88,166,255,.18));
+        animation: float 5s ease-in-out infinite;
+      }
+
+      @keyframes float {
+        0%, 100% { transform: translateY(0); }
+        50%       { transform: translateY(-10px); }
+      }
+
+      .hero-eyebrow {
+        font-size: 12px;
+        font-weight: 700;
+        letter-spacing: .12em;
+        text-transform: uppercase;
+        color: var(--accent);
+        margin-bottom: 14px;
+      }
+
+      .hero-title {
+        font-size: clamp(36px, 6vw, 62px);
+        font-weight: 800;
+        letter-spacing: -.03em;
+        line-height: 1.1;
+        color: var(--ink);
+        margin-bottom: 20px;
+      }
+
+      .hero-title span {
+        background: linear-gradient(135deg, var(--accent) 0%, #a371f7 100%);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+      }
+
+      .hero-sub {
+        font-size: 17px;
+        color: var(--muted);
+        max-width: 560px;
+        line-height: 1.65;
+        margin-bottom: 40px;
+      }
+
+      .hero-actions {
+        display: flex;
+        gap: 12px;
+        flex-wrap: wrap;
+        justify-content: center;
+      }
+
+      .btn-primary {
+        display: inline-flex;
+        align-items: center;
+        gap: 9px;
+        padding: 14px 30px;
+        background: var(--accent-dark);
+        color: #fff;
+        border-radius: var(--radius);
+        font-size: 15px;
+        font-weight: 700;
+        text-decoration: none;
+        transition: background .15s, box-shadow .15s, transform .1s;
+        box-shadow: 0 0 0 1px rgba(88,166,255,.3), 0 4px 18px rgba(31,111,235,.45);
+      }
+
+      .btn-primary:hover {
+        background: var(--accent);
+        box-shadow: 0 0 0 1px rgba(88,166,255,.55), 0 6px 24px rgba(88,166,255,.4);
+        transform: translateY(-1px);
+      }
+
+      .btn-secondary {
+        display: inline-flex;
+        align-items: center;
+        gap: 9px;
+        padding: 14px 30px;
+        background: transparent;
+        color: var(--ink-2);
+        border: 1px solid var(--border);
+        border-radius: var(--radius);
+        font-size: 15px;
+        font-weight: 600;
+        text-decoration: none;
+        transition: border-color .15s, background .15s, transform .1s;
+      }
+
+      .btn-secondary:hover {
+        border-color: var(--accent);
+        background: var(--accent-soft);
+        transform: translateY(-1px);
+      }
+
+      /* ── Features ── */
+      .features {
+        max-width: 1100px;
+        margin: 0 auto;
+        padding: 80px 24px;
+        width: 100%;
+      }
+
+      .section-label {
+        text-align: center;
+        font-size: 12px;
+        font-weight: 700;
+        letter-spacing: .1em;
+        text-transform: uppercase;
+        color: var(--muted);
+        margin-bottom: 14px;
+      }
+
+      .section-title {
+        text-align: center;
+        font-size: clamp(24px, 4vw, 36px);
+        font-weight: 800;
+        letter-spacing: -.02em;
+        color: var(--ink);
+        margin-bottom: 56px;
+      }
+
+      .feature-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+        gap: 16px;
+      }
+
+      .feature-card {
+        background: var(--surface);
+        border: 1px solid var(--border);
+        border-radius: var(--radius);
+        padding: 28px;
+        display: flex;
+        flex-direction: column;
+        gap: 12px;
+        transition: border-color .2s, transform .2s, box-shadow .2s;
+      }
+
+      .feature-card:hover {
+        border-color: var(--accent);
+        transform: translateY(-3px);
+        box-shadow: 0 8px 32px rgba(0,0,0,.4);
+      }
+
+      .feature-icon {
+        width: 44px;
+        height: 44px;
+        border-radius: 10px;
+        display: grid;
+        place-items: center;
+        font-size: 22px;
+        flex-shrink: 0;
+      }
+
+      .feature-icon.blue   { background: rgba(88,166,255,.15); }
+      .feature-icon.green  { background: rgba(63,185,80,.15); }
+      .feature-icon.purple { background: rgba(163,113,247,.15); }
+      .feature-icon.orange { background: rgba(227,179,65,.15); }
+      .feature-icon.teal   { background: rgba(56,189,248,.15); }
+      .feature-icon.pink   { background: rgba(248,81,73,.15); }
+
+      .feature-title {
+        font-size: 15px;
+        font-weight: 700;
+        color: var(--ink);
+      }
+
+      .feature-desc {
+        font-size: 13px;
+        color: var(--muted);
+        line-height: 1.6;
+      }
+
+      /* ── Badges ── */
+      .badge-row {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        flex-wrap: wrap;
+        gap: 10px;
+        margin: 0 auto 80px;
+        max-width: 900px;
+        padding: 0 24px;
+      }
+
+      .badge {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        padding: 6px 14px;
+        border: 1px solid var(--border);
+        border-radius: 999px;
+        font-size: 12px;
+        font-weight: 600;
+        color: var(--ink-2);
+        background: var(--surface);
+      }
+
+      .badge-dot {
+        width: 7px;
+        height: 7px;
+        border-radius: 50%;
+        flex-shrink: 0;
+      }
+
+      .badge-dot.blue   { background: var(--accent); }
+      .badge-dot.green  { background: var(--ok); }
+      .badge-dot.purple { background: #a371f7; }
+
+      /* ── CTA Banner ── */
+      .cta-banner {
+        margin: 0 auto 80px;
+        max-width: 900px;
+        padding: 0 24px;
+        width: 100%;
+      }
+
+      .cta-inner {
+        background: linear-gradient(135deg, rgba(31,111,235,.2) 0%, rgba(163,113,247,.15) 100%);
+        border: 1px solid rgba(88,166,255,.25);
+        border-radius: 16px;
+        padding: 48px 40px;
+        text-align: center;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 20px;
+      }
+
+      .cta-title {
+        font-size: clamp(22px, 3.5vw, 32px);
+        font-weight: 800;
+        letter-spacing: -.02em;
+        color: var(--ink);
+      }
+
+      .cta-sub {
+        font-size: 15px;
+        color: var(--muted);
+        max-width: 480px;
+        line-height: 1.6;
+      }
+
+      /* ── Footer ── */
+      footer {
+        border-top: 1px solid var(--border);
+        padding: 20px 40px;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 16px;
+        flex-wrap: wrap;
+        color: var(--muted);
+        font-size: 12px;
+      }
+
+      .footer-brand {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        font-weight: 500;
+      }
+
+      .footer-brand img { width: 22px; height: 26px; opacity: .6; }
+
+      /* ── Responsive ── */
+      @media (max-width: 600px) {
+        nav { padding: 0 20px; }
+        .nav-sub { display: none; }
+        .hero { padding: 50px 20px 40px; }
+        .hero-logo { width: 190px; height: 190px; }
+        .cta-inner { padding: 32px 20px; }
+        footer { flex-direction: column; text-align: center; }
+      }
+    </style>
   </head>
   <body>
 
-    <header class="app-header">
-      <div class="header-inner">
-        <div class="brand">
-          <img src="/tux.svg" class="tux-logo" alt="Tux" />
-          <div class="brand-text">
-            <span class="brand-name">RepoForge</span>
-            <span class="brand-sub">Bynet AirBridge Package Studio</span>
-          </div>
+    <!-- ── Nav ── -->
+    <nav>
+      <a class="nav-brand" href="/">
+        <img src="/tux.svg" alt="Tux" />
+        <div class="nav-brand-text">
+          <span class="nav-name">RepoForge</span>
+          <span class="nav-sub">Bynet AirBridge</span>
         </div>
-        <div class="header-right">
-          <div class="sys-indicator" id="dockerIndicator" title="Docker Engine">
-            <span class="indicator-dot" id="dockerDot"></span>
-            <span id="dockerLabel">Docker</span>
-          </div>
-          <div class="build-badge" id="buildBadge">
-            <span class="badge-dot"></span>
-            <span id="badgeText">Ready</span>
-          </div>
-        </div>
+      </a>
+      <a class="nav-launch" href="/app">
+        <svg width="14" height="14" viewBox="0 0 20 20" fill="currentColor">
+          <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM9.555 7.168A1 1 0 008 8v4a1 1 0 001.555.832l3-2a1 1 0 000-1.664l-3-2z" clip-rule="evenodd"/>
+        </svg>
+        Launch App
+      </a>
+    </nav>
+
+    <!-- ── Hero ── -->
+    <section class="hero">
+      <img class="hero-logo" src="/logo.png" alt="RepoForge logo" onerror="this.src='/tux.svg';this.style.width='180px';this.style.height='180px'" />
+      <p class="hero-eyebrow">Bynet AirBridge Package Studio</p>
+      <h1 class="hero-title">Build Linux Packages<br><span>for Air-Gapped Networks</span></h1>
+      <p class="hero-sub">
+        Bundle <strong>.deb</strong> and <strong>.rpm</strong> packages with all their dependencies into
+        a single offline archive — ready to deploy anywhere, no internet required.
+      </p>
+      <div class="hero-actions">
+        <a class="btn-primary" href="/app">
+          <svg width="16" height="16" viewBox="0 0 20 20" fill="currentColor">
+            <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM9.555 7.168A1 1 0 008 8v4a1 1 0 001.555.832l3-2a1 1 0 000-1.664l-3-2z" clip-rule="evenodd"/>
+          </svg>
+          Open Package Builder
+        </a>
+        <a class="btn-secondary" href="https://github.com/lidorzx/RepoForge" target="_blank" rel="noopener">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+            <path d="M12 0C5.37 0 0 5.37 0 12c0 5.3 3.438 9.8 8.205 11.385.6.113.82-.258.82-.577 0-.285-.01-1.04-.015-2.04-3.338.724-4.042-1.61-4.042-1.61-.546-1.385-1.335-1.755-1.335-1.755-1.087-.744.084-.729.084-.729 1.205.084 1.838 1.236 1.838 1.236 1.07 1.835 2.809 1.305 3.495.998.108-.776.417-1.305.76-1.605-2.665-.3-5.466-1.332-5.466-5.93 0-1.31.465-2.38 1.235-3.22-.135-.303-.54-1.523.105-3.176 0 0 1.005-.322 3.3 1.23.96-.267 1.98-.399 3-.405 1.02.006 2.04.138 3 .405 2.28-1.552 3.285-1.23 3.285-1.23.645 1.653.24 2.873.12 3.176.765.84 1.23 1.91 1.23 3.22 0 4.61-2.805 5.625-5.475 5.92.42.36.81 1.096.81 2.22 0 1.606-.015 2.896-.015 3.286 0 .315.21.69.825.57C20.565 21.795 24 17.295 24 12c0-6.63-5.37-12-12-12z"/>
+          </svg>
+          View on GitHub
+        </a>
       </div>
-    </header>
+    </section>
 
-    <div class="app-body">
-
-      <!-- ── LEFT: Build Form ──────────────────────────────────────────── -->
-      <section class="form-col">
-        <form id="jobForm" autocomplete="off">
-
-          <div class="card form-card">
-            <div class="card-header">
-              <h2>Target OS</h2>
-            </div>
-            <div class="os-families" id="osFamilies"></div>
-          </div>
-
-          <div class="card form-card row-card">
-            <div class="row-half">
-              <div class="card-header">
-                <h2>Architecture</h2>
-              </div>
-              <div class="arch-group">
-                <label class="arch-chip">
-                  <input type="radio" name="arch" value="amd64" checked />
-                  <span class="chip-body"><strong>amd64</strong><small>x86-64</small></span>
-                </label>
-                <label class="arch-chip">
-                  <input type="radio" name="arch" value="arm64" />
-                  <span class="chip-body"><strong>arm64</strong><small>ARM / M-chip</small></span>
-                </label>
-              </div>
-            </div>
-            <div class="row-half">
-              <div class="card-header">
-                <h2>Packages</h2>
-              </div>
-              <input
-                id="packages"
-                name="packages"
-                type="text"
-                class="pkg-input"
-                placeholder="nginx, curl, realmd"
-                required
-                spellcheck="false"
-              />
-            </div>
-          </div>
-
-          <div class="card form-card">
-            <div class="card-header">
-              <h2>Extra Repositories</h2>
-              <p>Add third-party repos before downloading packages.</p>
-            </div>
-            <div class="extra-repo-list" id="extraRepoList"></div>
-          </div>
-
-          <div class="card form-card presets-card">
-            <div class="card-header">
-              <h2>Common Scenarios</h2>
-              <p>Click to add packages.</p>
-            </div>
-            <div class="preset-grid" id="presetGrid"></div>
-          </div>
-
-          <div class="form-actions">
-            <button type="submit" class="btn-build" id="buildBtn">
-              <svg class="btn-icon" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM9.555 7.168A1 1 0 008 8v4a1 1 0 001.555.832l3-2a1 1 0 000-1.664l-3-2z" clip-rule="evenodd"/></svg>
-              Build Bundle
-            </button>
-            <a class="btn-download hidden" id="downloadLink" href="#">
-              <svg class="btn-icon" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M3 17a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm3.293-7.707a1 1 0 011.414 0L9 10.586V3a1 1 0 112 0v7.586l1.293-1.293a1 1 0 111.414 1.414l-3 3a1 1 0 01-1.414 0l-3-3a1 1 0 010-1.414z" clip-rule="evenodd"/></svg>
-              Download Bundle
-            </a>
-          </div>
-
-        </form>
-      </section>
-
-      <!-- ── RIGHT: Status + Logs ──────────────────────────────────────── -->
-      <section class="status-col">
-
-        <div class="card stats-card">
-          <div class="stat-item">
-            <span class="stat-label">Status</span>
-            <span class="stat-value status-badge" id="jobStatus">No job</span>
-          </div>
-          <div class="stat-item">
-            <span class="stat-label">Distro</span>
-            <code class="stat-value" id="jobDistro">—</code>
-          </div>
-          <div class="stat-item">
-            <span class="stat-label">Packages</span>
-            <code class="stat-value" id="jobPackages">—</code>
-          </div>
-          <div class="stat-item">
-            <span class="stat-label">Size</span>
-            <code class="stat-value" id="bundleSize">—</code>
-          </div>
-        </div>
-
-        <div class="card log-card">
-          <div class="log-toolbar">
-            <div class="log-toolbar-left">
-              <span class="log-dot red"></span>
-              <span class="log-dot yellow"></span>
-              <span class="log-dot green"></span>
-              <span class="log-title">Build Log</span>
-            </div>
-            <code class="log-job-id" id="logJobId">—</code>
-          </div>
-          <pre class="log-body" id="logs">Logs will appear here once a build starts.</pre>
-        </div>
-
-      </section>
+    <!-- ── Support Badges ── -->
+    <div class="badge-row">
+      <span class="badge"><span class="badge-dot blue"></span>Ubuntu 20.04 / 22.04 / 24.04</span>
+      <span class="badge"><span class="badge-dot blue"></span>Debian 11 / 12</span>
+      <span class="badge"><span class="badge-dot green"></span>RHEL / Rocky / AlmaLinux 8 &amp; 9</span>
+      <span class="badge"><span class="badge-dot purple"></span>amd64 &amp; arm64</span>
+      <span class="badge"><span class="badge-dot green"></span>Docker-powered</span>
     </div>
 
-    <!-- History -->
-    <div class="history-wrap">
-      <div class="card history-card">
-        <div class="card-header">
-          <h2>Recent Jobs</h2>
+    <!-- ── Features ── -->
+    <section class="features">
+      <p class="section-label">What it does</p>
+      <h2 class="section-title">Everything you need for offline deployments</h2>
+      <div class="feature-grid">
+
+        <div class="feature-card">
+          <div class="feature-icon blue">📦</div>
+          <div class="feature-title">.deb &amp; .rpm Bundles</div>
+          <div class="feature-desc">
+            Download packages and all their transitive dependencies for Debian and RPM-based
+            distributions in one click.
+          </div>
         </div>
-        <div class="history-list" id="jobHistory">
-          <div class="history-empty">No jobs yet.</div>
+
+        <div class="feature-card">
+          <div class="feature-icon green">✈️</div>
+          <div class="feature-title">True Air-Gap Support</div>
+          <div class="feature-desc">
+            Built for restricted networks. Generate a single <code>.tar.gz</code> you can copy
+            onto any USB drive or secure share.
+          </div>
         </div>
+
+        <div class="feature-card">
+          <div class="feature-icon purple">🐳</div>
+          <div class="feature-title">Docker-Isolated Builds</div>
+          <div class="feature-desc">
+            Each build runs inside a clean container matching the target distro — no host
+            pollution, reproducible every time.
+          </div>
+        </div>
+
+        <div class="feature-card">
+          <div class="feature-icon orange">⚡</div>
+          <div class="feature-title">Extra Repos &amp; Presets</div>
+          <div class="feature-desc">
+            Enable third-party repos (Docker CE, Kubernetes, Grafana…) before bundling, or
+            pick a common scenario preset to populate packages instantly.
+          </div>
+        </div>
+
+        <div class="feature-card">
+          <div class="feature-icon teal">🖥️</div>
+          <div class="feature-title">Multi-Arch</div>
+          <div class="feature-desc">
+            Target <strong>amd64</strong> or <strong>arm64</strong> from the same UI — ideal
+            for mixed server fleets and modern ARM workloads.
+          </div>
+        </div>
+
+        <div class="feature-card">
+          <div class="feature-icon pink">📋</div>
+          <div class="feature-title">Live Build Log</div>
+          <div class="feature-desc">
+            Watch real-time terminal output as packages are resolved, downloaded, and archived.
+            Full job history with one-click re-download.
+          </div>
+        </div>
+
+      </div>
+    </section>
+
+    <!-- ── CTA Banner ── -->
+    <div class="cta-banner">
+      <div class="cta-inner">
+        <h2 class="cta-title">Ready to build your first bundle?</h2>
+        <p class="cta-sub">
+          Select a distro, drop in your package names, and hit Build. Your offline archive
+          will be ready to download in seconds.
+        </p>
+        <a class="btn-primary" href="/app">
+          <svg width="16" height="16" viewBox="0 0 20 20" fill="currentColor">
+            <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM9.555 7.168A1 1 0 008 8v4a1 1 0 001.555.832l3-2a1 1 0 000-1.664l-3-2z" clip-rule="evenodd"/>
+          </svg>
+          Open Package Builder
+        </a>
       </div>
     </div>
 
-    <footer class="app-footer">
+    <!-- ── Footer ── -->
+    <footer>
       <div class="footer-brand">
-        <img src="/tux.svg" class="tux-logo footer-tux" alt="Tux" />
+        <img src="/tux.svg" alt="Tux" />
         <span>Bynet Data Communications</span>
       </div>
-      <span class="footer-author">AirBridge Package Studio &nbsp;·&nbsp; Author: <strong>Lidor Eliya</strong> — Linux Engineer</span>
+      <span>AirBridge Package Studio &nbsp;·&nbsp; Author: <strong style="color:var(--ink-2)">Lidor Eliya</strong> — Linux Engineer</span>
+      <span>v0.3.0</span>
     </footer>
 
-    <script src="/app.js"></script>
   </body>
 </html>

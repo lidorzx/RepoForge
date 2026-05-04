@@ -195,4 +195,9 @@ def download_job(job_id: UUID) -> FileResponse:
     )
 
 
+@app.get("/app", include_in_schema=False)
+def serve_app():
+    return FileResponse(STATIC_DIR / "app.html", media_type="text/html")
+
+
 app.mount("/", StaticFiles(directory=STATIC_DIR, html=True), name="static")
