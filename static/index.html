@@ -7,166 +7,83 @@
     <link rel="icon" type="image/svg+xml" href="/tux.svg" />
     <link rel="stylesheet" href="/styles.css" />
   </head>
-  <body>
-    <header class="app-header">
-      <div class="header-inner">
-        <div class="brand">
-          <span class="logo-frame">
-            <img src="/tux.svg" class="tux-logo" alt="Linux Tux" />
-          </span>
-          <div class="brand-text">
-            <span class="brand-name">RepoForge</span>
-            <span class="brand-sub">Offline Linux Package Bundles</span>
-          </div>
-        </div>
-        <div class="header-right">
-          <div class="sys-indicator" id="dockerIndicator" title="Docker Engine">
-            <span class="indicator-dot" id="dockerDot"></span>
-            <span id="dockerLabel">Docker</span>
-          </div>
-          <div class="build-badge" id="buildBadge">
-            <span class="badge-dot"></span>
-            <span id="badgeText">Ready</span>
-          </div>
-        </div>
-      </div>
+  <body class="landing-page">
+    <header class="landing-header">
+      <a class="landing-brand" href="/">
+        <img src="/tux.svg" alt="RepoForge" />
+        <span>RepoForge</span>
+      </a>
+      <nav class="landing-nav" aria-label="Primary">
+        <a href="#targets">Targets</a>
+        <a href="#workflow">Workflow</a>
+        <a class="landing-nav-action" href="/app.html">Open Builder</a>
+      </nav>
     </header>
 
-    <main class="app-body">
-      <section class="form-col">
-        <form id="jobForm" autocomplete="off">
-          <div class="card form-card">
-            <div class="card-header">
-              <h2>Target OS</h2>
-              <p>Select the operating system that matches the offline target server.</p>
-            </div>
-            <div class="os-families" id="osFamilies"></div>
-            <div class="distro-meta" id="distroMeta"></div>
-          </div>
-
-          <div class="card form-card row-card">
-            <div class="row-half">
-              <div class="card-header">
-                <h2>Architecture</h2>
-              </div>
-              <div class="arch-group">
-                <label class="arch-chip">
-                  <input type="radio" name="arch" value="amd64" checked />
-                  <span class="chip-body"><strong>amd64</strong><small>x86-64 servers</small></span>
-                </label>
-                <label class="arch-chip">
-                  <input type="radio" name="arch" value="arm64" />
-                  <span class="chip-body"><strong>arm64</strong><small>ARM platforms</small></span>
-                </label>
-              </div>
-            </div>
-            <div class="row-half">
-              <div class="card-header">
-                <h2>Packages</h2>
-                <p>Comma-separated package names.</p>
-              </div>
-              <input
-                id="packages"
-                name="packages"
-                type="text"
-                class="pkg-input"
-                placeholder="nginx, curl, realmd"
-                required
-                spellcheck="false"
-              />
+    <main>
+      <section class="landing-hero">
+        <div class="landing-hero-bg" aria-hidden="true"></div>
+        <div class="landing-hero-inner">
+          <div class="landing-copy">
+            <p class="landing-eyebrow">Offline package bundles for air-gapped Linux</p>
+            <h1>RepoForge</h1>
+            <p class="landing-lede">
+              Resolve packages in clean distro containers, download the dependency closure,
+              and ship one installable archive to disconnected servers.
+            </p>
+            <div class="landing-actions">
+              <a class="landing-primary" href="/app.html">Open Builder</a>
+              <a class="landing-secondary" href="https://github.com/lidorzx/RepoForge">View GitHub</a>
             </div>
           </div>
-
-          <div class="card form-card">
-            <div class="card-header">
-              <h2>Extra Repositories</h2>
-              <p>Add supported third-party repositories before resolving packages.</p>
-            </div>
-            <div class="extra-repo-list" id="extraRepoList"></div>
-          </div>
-
-          <div class="card form-card presets-card">
-            <div class="card-header">
-              <h2>Common Scenarios</h2>
-              <p>Choose a preset to add its packages to the build list.</p>
-            </div>
-            <div class="preset-grid" id="presetGrid"></div>
-          </div>
-
-        </form>
+        </div>
       </section>
 
-      <section class="status-col">
-        <div class="card stats-card">
-          <div class="stat-item">
-            <span class="stat-label">Status</span>
-            <span class="stat-value status-badge" id="jobStatus">No job</span>
+      <section class="landing-strip" id="targets">
+        <div class="landing-strip-inner">
+          <div>
+            <span class="landing-label">Targets</span>
+            <strong>Ubuntu, Debian, Rocky Linux, AlmaLinux</strong>
           </div>
-          <div class="stat-item">
-            <span class="stat-label">Distro</span>
-            <code class="stat-value" id="jobDistro">-</code>
+          <div>
+            <span class="landing-label">Packages</span>
+            <strong>.deb and .rpm bundles</strong>
           </div>
-          <div class="stat-item">
-            <span class="stat-label">Packages</span>
-            <code class="stat-value" id="jobPackages">-</code>
-          </div>
-          <div class="stat-item">
-            <span class="stat-label">Size</span>
-            <code class="stat-value" id="bundleSize">-</code>
+          <div>
+            <span class="landing-label">Output</span>
+            <strong>tar.gz with manifest and checksums</strong>
           </div>
         </div>
+      </section>
 
-        <div class="card log-card">
-          <div class="log-toolbar">
-            <div class="log-toolbar-left">
-              <span class="log-dot red"></span>
-              <span class="log-dot yellow"></span>
-              <span class="log-dot green"></span>
-              <span class="log-title">Build Log</span>
-            </div>
-            <code class="log-job-id" id="logJobId">-</code>
-          </div>
-          <pre class="log-body" id="logs">Logs will appear here once a build starts.</pre>
+      <section class="landing-section" id="workflow">
+        <div class="landing-section-head">
+          <p class="landing-eyebrow">From package name to offline archive</p>
+          <h2>Built for integrators who need clean, repeatable bundles.</h2>
         </div>
-
-        <div class="card form-actions-card">
-          <button type="submit" form="jobForm" class="btn-build" id="buildBtn">
-            <svg class="btn-icon" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
-              <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM9.555 7.168A1 1 0 008 8v4a1 1 0 001.555.832l3-2a1 1 0 000-1.664l-3-2z" clip-rule="evenodd"/>
-            </svg>
-            Build Bundle
-          </button>
-          <a class="btn-download hidden" id="downloadLink" href="#">
-            <svg class="btn-icon" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
-              <path fill-rule="evenodd" d="M3 17a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm3.293-7.707a1 1 0 011.414 0L9 10.586V3a1 1 0 112 0v7.586l1.293-1.293a1 1 0 111.414 1.414l-3 3a1 1 0 01-1.414 0l-3-3a1 1 0 010-1.414z" clip-rule="evenodd"/>
-            </svg>
-            Download Bundle
-          </a>
+        <div class="landing-grid">
+          <article>
+            <span>01</span>
+            <h3>Select target OS</h3>
+            <p>Resolve inside the matching container, such as Ubuntu 22.04 or Rocky Linux 9.</p>
+          </article>
+          <article>
+            <span>02</span>
+            <h3>Enter packages</h3>
+            <p>Use package names like curl, nginx, realmd, sssd, or Docker components.</p>
+          </article>
+          <article>
+            <span>03</span>
+            <h3>Download bundle</h3>
+            <p>Get packages, install script, README, manifest, and SHA-256 checksums.</p>
+          </article>
         </div>
       </section>
     </main>
 
-    <section class="history-wrap">
-      <div class="card history-card">
-        <div class="card-header">
-          <h2>Recent Jobs</h2>
-        </div>
-        <div class="history-list" id="jobHistory">
-          <div class="history-empty">No jobs yet.</div>
-        </div>
-      </div>
-    </section>
-
-    <footer class="app-footer">
-      <div class="footer-brand">
-        <span class="logo-frame footer-logo">
-          <img src="/tux.svg" class="tux-logo footer-tux" alt="Linux Tux" />
-        </span>
-        <span>RepoForge</span>
-      </div>
-      <span class="footer-author">Author: <strong>Lidor Eliya</strong> - Linux Engineer</span>
+    <footer class="landing-footer">
+      <span>RepoForge</span>
+      <span>Author: Lidor Eliya</span>
     </footer>
-
-    <script src="/app.js"></script>
   </body>
 </html>
