@@ -28,6 +28,7 @@ const enabledRepos = new Map();
 const FAMILY_META = {
   debian: { label: "Debian / Ubuntu" },
   rhel: { label: "RHEL Family" },
+  suse: { label: "SUSE Family" },
 };
 
 const STATUS_CLASS = {
@@ -75,6 +76,9 @@ function osDisplayParts(distro) {
   }
   if (distro.id.startsWith("almalinux-")) {
     return { name: "AlmaLinux", detail: distro.label.replace("AlmaLinux ", "") };
+  }
+  if (distro.id.startsWith("opensuse-leap-")) {
+    return { name: "openSUSE", detail: "Leap " + distro.label.replace("openSUSE Leap ", "") };
   }
   return { name: distro.label, detail: distro.id };
 }
@@ -165,6 +169,7 @@ function updateDistroMeta() {
     return;
   }
 
+  const pkgMgr = info.family === "suse" ? "zypper / rpm" : "dnf / rpm";
   const rows = info.family === "debian" && info.suites
     ? [
         ["Codename", info.codename || "-"],
@@ -172,7 +177,7 @@ function updateDistroMeta() {
       ]
     : [
         ["Codename", info.codename || "-"],
-        ["Package manager", "dnf / rpm"],
+        ["Package manager", pkgMgr],
       ];
 
   distroMeta.replaceChildren();

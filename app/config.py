@@ -90,6 +90,22 @@ DISTRO_CATALOG: dict[str, dict] = {
         "pkg_ext": "rpm",
         "version": "9",
     },
+    "opensuse-leap-15.5": {
+        "label": "openSUSE Leap 15.5",
+        "family": "suse",
+        "docker_image": "opensuse/leap:15.5",
+        "codename": "Piko",
+        "pkg_ext": "rpm",
+        "version": "15.5",
+    },
+    "opensuse-leap-15.6": {
+        "label": "openSUSE Leap 15.6",
+        "family": "suse",
+        "docker_image": "opensuse/leap:15.6",
+        "codename": "Kalimba",
+        "pkg_ext": "rpm",
+        "version": "15.6",
+    },
 }
 
 SUPPORTED_DISTRO_IDS = tuple(DISTRO_CATALOG.keys())
@@ -119,7 +135,7 @@ EXTRA_REPOS: dict[str, dict] = {
     "docker-ce": {
         "label": "Docker CE",
         "description": "Official Docker Engine, CLI, containerd, buildx, and compose plugin.",
-        "families": ["debian", "rhel"],
+        "families": ["debian", "rhel", "suse"],
         "versioned": False,
         "default_packages": [
             "docker-ce", "docker-ce-cli", "containerd.io",
@@ -210,5 +226,43 @@ PACKAGE_OPTIONS = [
         "description": "Prometheus node exporter and sysstat for host-level metrics.",
         "distro_families": ["debian", "rhel"],
         "packages": ("prometheus-node-exporter", "sysstat", "lsof", "strace"),
+    },
+    {
+        "id": "ops-baseline-suse",
+        "title": "Operations Baseline",
+        "description": "Common admin tools: curl, wget, vim, net-tools, ca-certificates.",
+        "distro_families": ["suse"],
+        "packages": ("curl", "wget", "vim", "net-tools", "ca-certificates"),
+    },
+    {
+        "id": "ssh-tools-suse",
+        "title": "SSH and File Transfer",
+        "description": "OpenSSH server/client and rsync for remote administration.",
+        "distro_families": ["suse"],
+        "packages": ("openssh", "rsync"),
+    },
+    {
+        "id": "web-nginx-suse",
+        "title": "Nginx Web Server",
+        "description": "Serve HTTP/S traffic with Nginx.",
+        "distro_families": ["suse"],
+        "packages": ("nginx",),
+    },
+    {
+        "id": "web-apache-suse",
+        "title": "Apache Web Server",
+        "description": "Apache HTTP server and SSL module for openSUSE.",
+        "distro_families": ["suse"],
+        "packages": ("apache2", "apache2-mod_ssl"),
+    },
+    {
+        "id": "identity-ad-suse",
+        "title": "Active Directory Join",
+        "description": "Join an openSUSE machine to Microsoft Active Directory.",
+        "distro_families": ["suse"],
+        "packages": (
+            "realmd", "sssd", "sssd-tools", "adcli", "krb5-client",
+            "samba-client", "chrony",
+        ),
     },
 ]

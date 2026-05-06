@@ -140,6 +140,8 @@ class BundleBuilder:
             container_script = self._apt_script(packages, distro, architecture, extra_repos)
         elif family == "rhel":
             container_script = self._dnf_script(packages, distro, architecture, extra_repos)
+        elif family == "suse":
+            container_script = self._zypper_script(packages, distro, architecture, extra_repos)
         else:
             raise BundleBuildError(f"Unsupported distro family: {family}")
 
@@ -254,6 +256,17 @@ REPOEOF
 """
         return ""
 
+    @staticmethod
+    def _zypper_repo_snippet(repo_id: str, version: str | None, distro: dict, architecture: str) -> str:
+        if repo_id == "docker-ce":
+            return """
+echo "--- Adding Docker CE repository (openSUSE) ---"
+zypper --non-interactive install -y curl
+curl -fsSL https://download.docker.com/linux/opensuse/docker-ce.repo -o /etc/zypp/repos.d/docker-ce.repo
+zypper --non-interactive --gpg-auto-import-keys refresh
+"""
+        return ""
+
     # ── Container scripts ──────────────────────────────────────────────────
 
     @staticmethod
@@ -343,6 +356,39 @@ REPOEOF
             """
         ).strip()
 
+    @staticmethod
+    def _zypper_script(
+        packages: list[str],
+        distro: dict,
+        architecture: str,
+        extra_repos: list[str],
+    ) -> str:
+        package_args = " ".join(shlex.quote(p) for p in packages)
+
+        extra_setup = ""
+        for spec in extra_repos:
+            repo_id, _, version = spec.partition(":")
+            extra_setup += BundleBuilder._zypper_repo_snippet(repo_id, version or None, distro, architecture)
+
+        return textwrap.dedent(
+            f"""
+            set -euo pipefail
+            zypper --non-interactive --gpg-auto-import-keys refresh
+            {extra_setup}
+            for pkg in {package_args}; do
+              zypper --non-interactive info "$pkg" >/dev/null 2>&1 || (echo "Package not found in configured repositories: $pkg" >&2; exit 20)
+              echo "Candidate for $pkg:"
+              zypper --non-interactive info "$pkg" | grep -E '(Name|Version|Release|Arch|Repository)' | sed 's/^/  /'
+            done
+            mkdir -p /out/packages
+            zypper --non-interactive install --download-only --no-recommends {package_args}
+            find /var/cache/zypp/packages -type f -name '*.rpm' | while IFS= read -r f; do
+              cp -f "$f" /out/packages/
+            done
+            find /out/packages -type f -name '*.rpm' -exec basename {{}} \\; | sort
+            """
+        ).strip()
+
     # ── Bundle artifacts ───────────────────────────────────────────────────
 
     @staticmethod
@@ -358,19 +404,32 @@ REPOEOF
     @staticmethod
     def _write_install_script(bundle_root: Path, family: str) -> None:
         install_path = bundle_root / "install.sh"
-        if family == "rhel":
+        if family in ("rhel", "suse"):
+            pkg_mgr_note = "zypper / rpm" if family == "suse" else "dnf / yum / rpm"
+            install_cmd = (
+                "sudo zypper --non-interactive install packages/*.rpm"
+                if family == "suse"
+                else textwrap.dedent("""\
+                    if command -v dnf &>/dev/null; then
+                        sudo dnf install -y packages/*.rpm
+                    elif command -v yum &>/dev/null; then
+                        sudo yum install -y packages/*.rpm
+                    else
+                        sudo rpm -Uvh packages/*.rpm
+                    fi""")
+            )
             script = textwrap.dedent(
-                """\
+                f"""\
                 #!/usr/bin/env bash
-                # RepoForge bundle installer — RHEL / Rocky Linux / AlmaLinux
+                # RepoForge bundle installer — {'openSUSE / SUSE' if family == 'suse' else 'RHEL / Rocky Linux / AlmaLinux'}
                 set -euo pipefail
                 cd "$(dirname "$0")"
 
-                usage() {
+                usage() {{
                   echo "Usage: $(basename "$0") [OPTION]"
                   echo ""
                   echo "Options:"
-                  echo "  (none)       Install all RPMs with dnf/yum/rpm"
+                  echo "  (none)       Install all RPMs with {pkg_mgr_note}"
                   echo "  --check      Verify SHA-256 checksums only, do not install"
                   echo "  --list       List all package files in this bundle"
                   echo "  --help       Show this help message"
@@ -379,14 +438,14 @@ REPOEOF
                   echo "  sudo ./install.sh"
                   echo "  ./install.sh --check"
                   echo "  ./install.sh --list"
-                }
+                }}
 
-                case "${1:-}" in
+                case "${{1:-}}" in
                   --help)
                     usage; exit 0 ;;
                   --check)
                     echo "Verifying checksums..."
-                    sha256sum -c checksums.sha256 && echo "All checksums OK." || { echo "Checksum mismatch!" >&2; exit 1; }
+                    sha256sum -c checksums.sha256 && echo "All checksums OK." || {{ echo "Checksum mismatch!" >&2; exit 1; }}
                     exit 0 ;;
                   --list)
                     echo "Package files in this bundle:"
@@ -401,13 +460,7 @@ REPOEOF
                 esac
 
                 echo "Installing $(ls packages/*.rpm | wc -l) RPM package(s)..."
-                if command -v dnf &>/dev/null; then
-                    sudo dnf install -y packages/*.rpm
-                elif command -v yum &>/dev/null; then
-                    sudo yum install -y packages/*.rpm
-                else
-                    sudo rpm -Uvh packages/*.rpm
-                fi
+                {install_cmd}
                 echo "Done."
                 """
             )
@@ -548,6 +601,25 @@ REPOEOF
 
                 ```bash
                 sudo dnf install -y packages/*.rpm
+                ```
+                """
+            )
+        elif family == "suse":
+            install_section = textwrap.dedent(
+                """\
+                ## Install
+
+                Copy this directory to the target air-gapped server, then run:
+
+                ```bash
+                chmod +x install.sh
+                ./install.sh
+                ```
+
+                The installer runs:
+
+                ```bash
+                sudo zypper --non-interactive install packages/*.rpm
                 ```
                 """
             )
