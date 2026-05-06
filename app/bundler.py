@@ -208,6 +208,15 @@ apt-get install -y apt-transport-https ca-certificates curl gpg
 curl -fsSL https://pkgs.k8s.io/core:/stable:/v{version}/deb/Release.key | gpg --dearmor -o /etc/apt/keyrings/kubernetes-apt-keyring.gpg
 echo "deb [signed-by=/etc/apt/keyrings/kubernetes-apt-keyring.gpg] https://pkgs.k8s.io/core:/stable:/v{version}/deb/ /" > /etc/apt/sources.list.d/kubernetes.list
 """
+        if repo_id == "rancher-rke2" and version:
+            ver_minor = ".".join(version.split(".")[:2])
+            return f"""
+echo "--- Adding Rancher RKE2 {version} repository (Debian/Ubuntu) ---"
+apt-get install -y curl gpg
+curl -fsSL https://rpm.rancher.io/public.key | gpg --dearmor -o /etc/apt/keyrings/rancher-keyring.gpg
+echo "deb [signed-by=/etc/apt/keyrings/rancher-keyring.gpg] https://apt.rancher.io/rke2/stable/v{ver_minor}/deb/ /" > /etc/apt/sources.list.d/rancher-rke2.list
+apt-get update -qq
+"""
         return ""
 
     @staticmethod

@@ -153,8 +153,8 @@ EXTRA_REPOS: dict[str, dict] = {
     },
     "rancher-rke2": {
         "label": "Rancher RKE2",
-        "description": "Rancher Kubernetes Engine 2 — RPM packages from rpm.rancher.io (RHEL-family only).",
-        "families": ["rhel"],
+        "description": "Rancher Kubernetes Engine 2 — packages from rancher.io for RHEL and Debian/Ubuntu.",
+        "families": ["debian", "rhel"],
         "versioned": True,
         "versions": RKE2_VERSIONS,
         "default_version": "1.32",
