@@ -227,7 +227,7 @@ apt-get update -qq
         if repo_id == "docker-ce":
             return f"""
 echo "--- Adding Docker CE repository ---"
-dnf install -y curl
+dnf install -y --allowerasing curl
 curl -fsSL https://download.docker.com/linux/centos/docker-ce.repo -o /etc/yum.repos.d/docker-ce.repo
 """
         if repo_id == "kubernetes" and version:
@@ -267,13 +267,6 @@ REPOEOF
 
     @staticmethod
     def _zypper_repo_snippet(repo_id: str, version: str | None, distro: dict, architecture: str) -> str:
-        if repo_id == "docker-ce":
-            return """
-echo "--- Adding Docker CE repository (openSUSE) ---"
-zypper --non-interactive install -y curl
-curl -fsSL https://download.docker.com/linux/opensuse/docker-ce.repo -o /etc/zypp/repos.d/docker-ce.repo
-zypper --non-interactive --gpg-auto-import-keys refresh
-"""
         return ""
 
     # ── Container scripts ──────────────────────────────────────────────────

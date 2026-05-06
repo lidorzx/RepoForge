@@ -135,7 +135,7 @@ EXTRA_REPOS: dict[str, dict] = {
     "docker-ce": {
         "label": "Docker CE",
         "description": "Official Docker Engine, CLI, containerd, buildx, and compose plugin.",
-        "families": ["debian", "rhel", "suse"],
+        "families": ["debian", "rhel"],
         "versioned": False,
         "default_packages": [
             "docker-ce", "docker-ce-cli", "containerd.io",
