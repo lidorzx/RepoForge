@@ -6,7 +6,7 @@ package dependencies, downloads only the required packages, and creates a
 downloadable `tar.gz` bundle.
 
 Author: Lidor Eliya
-<img width="1990" height="1263" alt="image" src="https://github.com/user-attachments/assets/52bb3028-c3a4-4da4-84c4-ba6e81b996a8" />
+<img width="1870" height="1250" alt="image" src="https://github.com/user-attachments/assets/8aa057f5-546a-48f0-aa26-5a41d960adbf" />
 
 ## Supported Targets
 
